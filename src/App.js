@@ -1,8 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
 import Button from '@material-ui/core/Button';
-import { withStyles } from '@material-ui/core/styles';
-import { purple } from '@material-ui/core/colors';
 import Grid from '@material-ui/core/Grid';
 import React, { useState, useEffect } from 'react';
 import PancakeFactory from './abi/PancakeFactory.json';
