@@ -1,3 +1,3 @@
 # Captial
 
-Author: jaycheungchunman
+Author: codeislaw
