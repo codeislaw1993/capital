@@ -4,26 +4,20 @@ import Button from '@material-ui/core/Button';
 import { withStyles } from '@material-ui/core/styles';
 import { purple } from '@material-ui/core/colors';
 import Grid from '@material-ui/core/Grid';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import PancakeFactory from './abi/PancakeFactory.json';
 import PancakeRouter from './abi/PancakeRouter.json';
 import Web3 from 'web3';
 
 function App() {
 
-  const demicals = 1000000000000000000;
   let [myAccount,setMyAccount] = useState("CONNECT YOUR WALLET");
-  const [accounts,setAccounts] = useState();
   const [myContract,setMyContract] = useState();
   const [myRouterContract,setMyRouterContract] = useState();
   const [myHongContract, setMyHongContract] = useState();
   const [myBUSDContract, setMyBUSDContract] = useState();
   const [myLPContract, setMyLPContract] = useState();
   const [currentNetworkID,setcurrentNetworkID] = useState();
-
-  const refreshPage = ()=> {
-    window.location.reload(false);
-  }
 
   const ethEnabled = async() => {
     if (window.web3) {
@@ -42,6 +36,7 @@ function App() {
       setMyAccount(accounts[0])
       console.log("Account connected?");
       console.log(myAccount);
+      console.log(currentNetworkID);
 
       const data = require('./abi/Hong.json');
 
