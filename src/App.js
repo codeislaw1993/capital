@@ -8,6 +8,13 @@ import React, { useState, useEffect } from 'react';
 import PancakeFactory from './abi/PancakeFactory.json';
 import PancakeRouter from './abi/PancakeRouter.json';
 import Web3 from 'web3';
+import dotent from 'dotenv'
+
+const MY_CONTRACT = process.env.REACT_APP_MY_CONTRACT
+const MY_ROUTER_CONTRACT=process.env.REACT_APP_MY_ROUTER_CONTRACT
+const MY_HONG_CONTRACT=process.env.REACT_APP_MY_HONG_CONTRACT
+const MY_BUSD_CONTRACT=process.env.REACT_APP_MY_BUSD_CONTRACT
+const MY_LP_CONTRACT=process.env.REACT_APP_MY_LP_CONTRACT
 
 function App() {
 
@@ -40,19 +47,19 @@ function App() {
 
       const data = require('./abi/Hong.json');
 
-      setMyContract(await new window.web3.eth.Contract(PancakeFactory.abi, '0x83f9805d24d72377d628D2B8d04C2C524fC774C9'));
-      setMyRouterContract(await new window.web3.eth.Contract(PancakeRouter.abi, '0xE0651d22dB6b1681B0B5DB1049B60123Efc2E348'));
-      setMyHongContract(await new window.web3.eth.Contract(data, '0xd98996c1DB608Ff8C265428796b44Ae8e8642289'));
-      setMyBUSDContract(await new window.web3.eth.Contract(data, '0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee'));
-      setMyLPContract(await new window.web3.eth.Contract(data, '0xb043516b7bbd5d4eea5e5c29ab246c8fa8a5d2ea'));
+      setMyContract(await new window.web3.eth.Contract(PancakeFactory.abi, MY_CONTRACT));
+      setMyRouterContract(await new window.web3.eth.Contract(PancakeRouter.abi, MY_ROUTER_CONTRACT));
+      setMyHongContract(await new window.web3.eth.Contract(data, MY_HONG_CONTRACT));
+      setMyBUSDContract(await new window.web3.eth.Contract(data, MY_BUSD_CONTRACT));
+      setMyLPContract(await new window.web3.eth.Contract(data, MY_LP_CONTRACT));
     }
   }
 
   const addLiquidityFunction = async() => {
     if (myContract) {
       let args: Array<string | string[] | number> = [
-        '0xd98996c1DB608Ff8C265428796b44Ae8e8642289',
-        '0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee',
+        MY_HONG_CONTRACT,
+        MY_BUSD_CONTRACT,
         window.web3.utils.toBN(100000000000000000).toString(),
         window.web3.utils.toBN(100000000000000000).toString(),
         window.web3.utils.toBN(0).toString(),
@@ -62,7 +69,7 @@ function App() {
       ]
 
       let approveArgs: Array<string | string[] | number> = [
-        '0xE0651d22dB6b1681B0B5DB1049B60123Efc2E348',
+        MY_ROUTER_CONTRACT,
         window.web3.utils.toBN(1000000000000000000).toString()
       ]
 
@@ -91,8 +98,8 @@ function App() {
   const removeLiquidityFunction = async() => {
     if (myContract) {
       let args: Array<string | string[] | number> = [
-        '0xd98996c1DB608Ff8C265428796b44Ae8e8642289',
-        '0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee',
+        MY_HONG_CONTRACT,
+        MY_BUSD_CONTRACT,
         window.web3.utils.toBN(100000000000000000).toString(),
         window.web3.utils.toBN(100000000000000000).toString(),
         window.web3.utils.toBN(0).toString(),
@@ -101,7 +108,7 @@ function App() {
       ]
 
       let approveArgs: Array<string | string[] | number> = [
-        '0xE0651d22dB6b1681B0B5DB1049B60123Efc2E348',
+        MY_ROUTER_CONTRACT,
         window.web3.utils.toBN(1000000000000000000).toString()
       ]
 
@@ -125,13 +132,13 @@ function App() {
       let args: Array<string | string[] | number> = [
         window.web3.utils.toBN(100000000000000000).toString(),
         window.web3.utils.toBN(0).toString(),
-        ["0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee", "0xd98996c1DB608Ff8C265428796b44Ae8e8642289"],
+        [MY_BUSD_CONTRACT, MY_HONG_CONTRACT],
         myAccount,
         '1741306645'
       ]
 
       let approveArgs: Array<string | string[] | number> = [
-        '0xE0651d22dB6b1681B0B5DB1049B60123Efc2E348',
+        MY_ROUTER_CONTRACT,
         window.web3.utils.toBN(1000000000000000000).toString()
       ]
 
@@ -154,13 +161,13 @@ function App() {
       let args: Array<string | string[] | number> = [
         window.web3.utils.toBN(100000000000000000).toString(),
         window.web3.utils.toBN(0).toString(),
-        ["0xd98996c1DB608Ff8C265428796b44Ae8e8642289", "0xeD24FC36d5Ee211Ea25A80239Fb8C4Cfd80f12Ee"],
+        [MY_HONG_CONTRACT, MY_BUSD_CONTRACT],
         myAccount,
         '1741306645'
       ]
 
       let approveArgs: Array<string | string[] | number> = [
-        '0xE0651d22dB6b1681B0B5DB1049B60123Efc2E348',
+        MY_ROUTER_CONTRACT,
         window.web3.utils.toBN(1000000000000000000).toString()
       ]
 
