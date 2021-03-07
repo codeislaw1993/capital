@@ -8,7 +8,6 @@ import React, { useState, useEffect } from 'react';
 import PancakeFactory from './abi/PancakeFactory.json';
 import PancakeRouter from './abi/PancakeRouter.json';
 import Web3 from 'web3';
-import dotent from 'dotenv'
 
 const MY_CONTRACT = process.env.REACT_APP_MY_CONTRACT
 const MY_ROUTER_CONTRACT=process.env.REACT_APP_MY_ROUTER_CONTRACT
