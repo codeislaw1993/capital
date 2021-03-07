@@ -1,6 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import Button from '@material-ui/core/Button';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
 import { withStyles } from '@material-ui/core/styles';
 import { purple } from '@material-ui/core/colors';
 import Grid from '@material-ui/core/Grid';
@@ -185,18 +186,8 @@ function App() {
     return false;
   }
 
-  const ColorButton = withStyles((theme) => ({
-    root: {
-      color: theme.palette.getContrastText(purple[500]),
-      backgroundColor: purple[500],
-      '&:hover': {
-        backgroundColor: purple[700],
-      },
-    },
-  }))(Button);
-
   useEffect(() => {
-    document.title = "UntitledSwap"
+    document.title = "Capital"
   }, []);
 
   return (
@@ -204,23 +195,25 @@ function App() {
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
         <p>
-          UntitledSwap
+          Capital
         </p>
-        <Grid container spacing={3}>
+        <Grid container>
           <Grid item xs={12}>
-            <Button variant="contained" color="primary" onClick={ethEnabled}>Connect Wallet</Button>
+            <ButtonGroup color="primary" aria-label="outlined primary button group">
+              <Button onClick={ethEnabled}>Connect Wallet</Button>
+            </ButtonGroup>
           </Grid>
-          <Grid item xs={6}>
-            <Button variant="contained" color="primary" onClick={addLiquidityFunction}>Add Liquidity</Button>
+          <Grid item xs={12}>
+            <ButtonGroup orientation="vertical" variant="text" color="primary" aria-label="outlined primary button group">
+              <Button color="primary" onClick={addLiquidityFunction}>Add Liquidity</Button>
+              <Button color="secondary" onClick={removeLiquidityFunction}>Remove Liquidity</Button>
+            </ButtonGroup>
           </Grid>
-          <Grid item xs={6}>
-            <Button variant="contained" color="primary" onClick={swapBUSDToHONG}>From 0.1 BUSD to HONG </Button>
-          </Grid>
-          <Grid item xs={6}>
-            <ColorButton variant="contained" color="secondary" onClick={removeLiquidityFunction}>Remove Liquidity</ColorButton>
-          </Grid>
-          <Grid item xs={6}>
-            <ColorButton variant="contained" color="secondary" onClick={swapHONGToBUSD}>From 0.1 HONG to BUSD </ColorButton>
+          <Grid item xs={12}>
+            <ButtonGroup orientation="vertical" variant="text" color="primary" aria-label="outlined primary button group">
+              <Button color="primary" onClick={swapBUSDToHONG}>From 0.1 BUSD to HONG </Button>
+              <Button color="secondary" onClick={swapHONGToBUSD}>From 0.1 HONG to BUSD </Button>
+            </ButtonGroup>
           </Grid>
         </Grid>
       </header>
