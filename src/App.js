@@ -15,6 +15,7 @@ const MY_MASTERCHEF_CONTRACT=process.env.REACT_APP_MY_MASTERCEHF_CONTRACT
 const MY_SYRUP_CONTRACT=process.env.REACT_APP_MY_SYRUP_CONTRACT
 const MY_CAKE_CONTRACT=process.env.REACT_APP_MY_CAKE_CONTRACT
 const BSCSCAN_TESTNET=process.env.REACT_APP_BSCSCAN_TESTNET
+const GITHUB=process.env.REACT_APP_GITHUB
 
 function App() {
 
@@ -362,6 +363,7 @@ function App() {
                 <h5><a target="_blank" rel="noreferrer" href={testnet_MY_MASTERCHEF_CONTRACT}>Check Liquidity Farm in BscScan testnet</a></h5>
                 <h5><a target="_blank" rel="noreferrer" href={testnet_MY_SYRUP_CONTRACT}>Check Syrup Bar in BscScan testnet</a></h5>
                 <h5><a target="_blank" rel="noreferrer" href={testnet_MY_CAKE_CONTRACT}>Check Cake (Delegator) in BscScan testnet</a></h5>
+                <h5><a target="_blank" rel="noreferrer" href={GITHUB}>GitHub</a></h5>
               </Col>
             </Row>
             <Row>
