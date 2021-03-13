@@ -1,10 +1,9 @@
-import logo from './logo.svg';
 import './App.css';
 import React, { useState, useEffect } from 'react';
 import PancakeFactory from './abi/PancakeFactory.json';
 import PancakeRouter from './abi/PancakeRouter.json';
 import Web3 from 'web3';
-import {Button, ButtonGroup, Container, Row, Col, Card, ListGroup, ListGroupItem, Toast } from 'react-bootstrap';
+import {Button, Container, Row, Col, Card, ListGroup, ListGroupItem, Toast } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const MY_CONTRACT = process.env.REACT_APP_MY_CONTRACT
@@ -26,7 +25,6 @@ function App() {
   const [myBUSDContract, setMyBUSDContract] = useState();
   const [myLPContract, setMyLPContract] = useState();
   const [myMasterChefContract, setMyMasterChefContract] = useState();
-  const [currentNetworkID,setcurrentNetworkID] = useState();
   const [amountOut,setAmountOut] = useState();
   const [amountIn,setAmountIn] = useState();
   const [hongReserve,setHongReserve] = useState();
@@ -50,11 +48,6 @@ function App() {
       const accounts = await web3js.eth.getAccounts(function (result) {
         console.log("account error:", result);
       });
-
-      const networkID = await web3js.eth.net.getId();
-      if (networkID) {
-        setcurrentNetworkID(networkID)
-      }
 
       setMyAccount(accounts[0])
 
@@ -361,14 +354,14 @@ function App() {
                 <Button variant="dark" onClick={refreshPrice}>Refresh Price</Button>
                 <h5>{hongReserve} HONG reserved</h5>
                 <h5>{busdReserve} BUSD reserved</h5>
-                <h5><a target="_blank" href={testnet_MY_CONTRACT}>Check Pancake Factory in BscScan testnet</a></h5>
-                <h5><a target="_blank" href={testnet_MY_ROUTER_CONTRACT}>Check Pancake Router in BscScan testnet</a></h5>
-                <h5><a target="_blank" href={testnet_MY_HONG_CONTRACT}>Check HONG in BscScan testnet</a></h5>
-                <h5><a target="_blank" href={testnet_MY_BUSD_CONTRACT}>Check BUSD in BscScan testnet</a></h5>
-                <h5><a target="_blank" href={testnet_MY_LP_CONTRACT}>Check Liquidity Pool in BscScan testnet</a></h5>
-                <h5><a target="_blank" href={testnet_MY_MASTERCHEF_CONTRACT}>Check Liquidity Farm in BscScan testnet</a></h5>
-                <h5><a target="_blank" href={testnet_MY_SYRUP_CONTRACT}>Check Syrup Bar in BscScan testnet</a></h5>
-                <h5><a target="_blank" href={testnet_MY_CAKE_CONTRACT}>Check Cake (Delegator) in BscScan testnet</a></h5>
+                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_CONTRACT}>Check Pancake Factory in BscScan testnet</a></h5>
+                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_ROUTER_CONTRACT}>Check Pancake Router in BscScan testnet</a></h5>
+                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_HONG_CONTRACT}>Check HONG in BscScan testnet</a></h5>
+                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_BUSD_CONTRACT}>Check BUSD in BscScan testnet</a></h5>
+                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_LP_CONTRACT}>Check Liquidity Pool in BscScan testnet</a></h5>
+                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_MASTERCHEF_CONTRACT}>Check Liquidity Farm in BscScan testnet</a></h5>
+                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_SYRUP_CONTRACT}>Check Syrup Bar in BscScan testnet</a></h5>
+                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_CAKE_CONTRACT}>Check Cake (Delegator) in BscScan testnet</a></h5>
               </Col>
             </Row>
             <Row>
