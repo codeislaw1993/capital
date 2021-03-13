@@ -1,3 +1,1 @@
-# Captial
-
-Author: codeislaw
+# How PancakeSwap scams
