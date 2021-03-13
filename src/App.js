@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import PancakeFactory from './abi/PancakeFactory.json';
 import PancakeRouter from './abi/PancakeRouter.json';
 import Web3 from 'web3';
-import { Button, ButtonGroup, Container, Row, Col, Card, ListGroup, ListGroupItem } from 'react-bootstrap';
+import {Button, ButtonGroup, Container, Row, Col, Card, ListGroup, ListGroupItem, Toast } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const MY_CONTRACT = process.env.REACT_APP_MY_CONTRACT
@@ -13,6 +13,9 @@ const MY_HONG_CONTRACT=process.env.REACT_APP_MY_HONG_CONTRACT
 const MY_BUSD_CONTRACT=process.env.REACT_APP_MY_BUSD_CONTRACT
 const MY_LP_CONTRACT=process.env.REACT_APP_MY_LP_CONTRACT
 const MY_MASTERCHEF_CONTRACT=process.env.REACT_APP_MY_MASTERCEHF_CONTRACT
+const MY_SYRUP_CONTRACT=process.env.REACT_APP_MY_SYRUP_CONTRACT
+const MY_CAKE_CONTRACT=process.env.REACT_APP_MY_CAKE_CONTRACT
+const BSCSCAN_TESTNET=process.env.REACT_APP_BSCSCAN_TESTNET
 
 function App() {
 
@@ -26,6 +29,18 @@ function App() {
   const [currentNetworkID,setcurrentNetworkID] = useState();
   const [amountOut,setAmountOut] = useState();
   const [amountIn,setAmountIn] = useState();
+  const [hongReserve,setHongReserve] = useState();
+  const [busdReserve,setBusdReservce] = useState();
+  const [quotedLPRatio,setQuotedLPRatio] = useState();
+  const [showA, setShowA] = useState();
+  const [showB, setShowB] = useState();
+  const [showC, setShowC] = useState();
+  const [farmInfo, setFarmInfo] = useState();
+  const [myFarmInfo, setMyFarmInfo] = useState();
+  const [pendingRewardInfo, setPendingRewardInfo] = useState();
+  const toggleShowA = () => setShowA(!showA);
+  const toggleShowB = () => setShowB(!showB);
+  const toggleShowC = () => setShowC(!showC);
 
   const ethEnabled = async() => {
     if (window.web3) {
@@ -75,6 +90,14 @@ function App() {
 
       myRouterContract.methods.getAmountsOut(...argsGetAmountsIn).call({from: myAccount}, function (result, error) {
         setAmountIn(error[1] / error[0]);
+      });
+
+      myLPContract.methods.getReserves().call({from: myAccount}, function (result, error) {
+        setHongReserve(error[0] / 1000000000000000000);
+        setBusdReservce(error[1] / 1000000000000000000);
+        let ratio1 = ("1 BUSD and " + error[0]/error[1] + " HONG to 1 LP");
+        let ratio2 = ("1 HONG and " + error[1]/error[0] + " BUSD to 1 LP");
+        setQuotedLPRatio(error[1] > error[0] ? ratio1 : ratio2 );
       });
     }
   }
@@ -260,10 +283,9 @@ function App() {
         myAccount
       ]
 
-      myMasterChefContract.methods.pendingCake(...args).call({from: myAccount}, function(result, error) {
-        console.log("myMasterChefContract pendingCake");
+      myMasterChefContract.methods.pendingCake(...args).call({from: myAccount}, function(error, result) {
         console.log(result);
-        console.log(error);
+        setPendingRewardInfo('Pending Reward: ' + result);
       });
     }
     return false;
@@ -274,11 +296,20 @@ function App() {
       let args: Array<string | string[] | number> = [
         window.web3.utils.toBN(1).toString()
       ]
-
-      myMasterChefContract.methods.poolInfo(...args).call({}, function(result, error) {
-        console.log("myMasterChefContract poolInfo");
-        console.log(result);
-        console.log(error);
+      let argsBalanceOf: Array<string | string[] | number> = [
+        MY_MASTERCHEF_CONTRACT
+      ]
+      myMasterChefContract.methods.poolInfo(...args).call({}, function(error, result) {
+        myLPContract.methods.balanceOf(...argsBalanceOf).call({}, function(error, result2) {
+          myMasterChefContract.methods.cakePerBlock().call({}, function(error, result3) {
+              setFarmInfo(
+                  'Total staked LP token: ' + (result2 / 100000000000000000)+ ", " +
+                  'Reward Per Block: ' + result3 + ", " +
+                  'Accumulative Reward Per Share: ' + result['accCakePerShare'] + ", " +
+                  'Allocated Point: ' + result['allocPoint'] + ", " +
+                  'Last Reward Block: ' + result['lastRewardBlock']);
+            });
+          });
       });
     }
     return false;
@@ -291,18 +322,33 @@ function App() {
         myAccount
       ]
 
-      myMasterChefContract.methods.userInfo(...args).call({}, function(result, error) {
-        console.log("myMasterChefContract userInfo");
-        console.log(result);
-        console.log(error);
+      myMasterChefContract.methods.userInfo(...args).call({}, function(error, result) {
+        setMyFarmInfo(
+            'My staked LP token: ' + (result['amount'] / 100000000000000000) + ", " +
+            'Reward Debt: ' + result['rewardDebt'])
       });
     }
     return false;
   }
 
   useEffect(() => {
-    document.title = "Capital"
+    document.title = "How PancakeSwap scams"
+
+    setAmountIn("?")
+    setAmountOut("?")
+    setQuotedLPRatio("? HONG and ? BUSD to 1 LP")
+    setQuotedLPRatio("? HONG and ? BUSD to 1 LP")
+
   }, []);
+
+  let testnet_MY_CONTRACT = BSCSCAN_TESTNET + MY_CONTRACT;
+  let testnet_MY_ROUTER_CONTRACT = BSCSCAN_TESTNET + MY_ROUTER_CONTRACT;
+  let testnet_MY_HONG_CONTRACT = BSCSCAN_TESTNET + MY_HONG_CONTRACT;
+  let testnet_MY_BUSD_CONTRACT = BSCSCAN_TESTNET + MY_BUSD_CONTRACT;
+  let testnet_MY_LP_CONTRACT = BSCSCAN_TESTNET + MY_LP_CONTRACT;
+  let testnet_MY_MASTERCHEF_CONTRACT = BSCSCAN_TESTNET + MY_MASTERCHEF_CONTRACT;
+  let testnet_MY_SYRUP_CONTRACT = BSCSCAN_TESTNET + MY_SYRUP_CONTRACT;
+  let testnet_MY_CAKE_CONTRACT = BSCSCAN_TESTNET + MY_CAKE_CONTRACT;
 
   return (
         <div className="App">
@@ -310,17 +356,59 @@ function App() {
           <Container>
             <Row>
               <Col>
+                <h3>How PancakeSwap scams</h3>
+                <Button variant="danger" onClick={ethEnabled}>Connect Wallet with Binance Smart Chain Testnet</Button>
+                <Button variant="dark" onClick={refreshPrice}>Refresh Price</Button>
+                <h5>{hongReserve} HONG reserved</h5>
+                <h5>{busdReserve} BUSD reserved</h5>
+                <h5><a target="_blank" href={testnet_MY_CONTRACT}>Check Pancake Factory in BscScan testnet</a></h5>
+                <h5><a target="_blank" href={testnet_MY_ROUTER_CONTRACT}>Check Pancake Router in BscScan testnet</a></h5>
+                <h5><a target="_blank" href={testnet_MY_HONG_CONTRACT}>Check HONG in BscScan testnet</a></h5>
+                <h5><a target="_blank" href={testnet_MY_BUSD_CONTRACT}>Check BUSD in BscScan testnet</a></h5>
+                <h5><a target="_blank" href={testnet_MY_LP_CONTRACT}>Check Liquidity Pool in BscScan testnet</a></h5>
+                <h5><a target="_blank" href={testnet_MY_MASTERCHEF_CONTRACT}>Check Liquidity Farm in BscScan testnet</a></h5>
+                <h5><a target="_blank" href={testnet_MY_SYRUP_CONTRACT}>Check Syrup Bar in BscScan testnet</a></h5>
+                <h5><a target="_blank" href={testnet_MY_CAKE_CONTRACT}>Check Cake (Delegator) in BscScan testnet</a></h5>
+              </Col>
+            </Row>
+            <Row>
+              <Col>
                 <Card>
                   <Card.Body>
-                    <Card.Title>HONG/BUSD Swap</Card.Title>
+                    <Card.Title>Swap</Card.Title>
                     <Card.Subtitle>1 BUSD to {amountIn} HONG</Card.Subtitle>
                     <Card.Subtitle>&nbsp;</Card.Subtitle>
+
+                    <Toast show={showA} onClose={toggleShowA} style={{ position: 'relative', left: '50%', transform: 'translateX(-50%)'}}>
+                      <Toast.Header>
+                        <strong className="mr-auto">Formula when 1 BUSD swaps</strong>
+                      </Toast.Header>
+                      <Toast.Body>1 BUSD * (HONG reserved * 998 / (BUSD reserved * 1000 + 99.8)) = HONG received</Toast.Body>
+                    </Toast>
+
                     <Card.Subtitle>1 HONG to {amountOut} BUSD</Card.Subtitle>
+                    <Card.Subtitle>&nbsp;</Card.Subtitle>
+
+                    <Toast show={showB} onClose={toggleShowB} style={{ position: 'relative', left: '50%', transform: 'translateX(-50%)'}}>
+                      <Toast.Header>
+                        <strong className="mr-auto">Formula when 1 HONG swaps</strong>
+                      </Toast.Header>
+                      <Toast.Body>1 HONG * (BUSD reserved * 998 / (HONG reserved * 1000 + 99.8)) = BUSD received</Toast.Body>
+                    </Toast>
+
+                    <Card.Subtitle>{quotedLPRatio} </Card.Subtitle>
+                    <Card.Subtitle>&nbsp;</Card.Subtitle>
+
+                    <Toast show={showC} onClose={toggleShowC} style={{ position: 'relative', left: '50%', transform: 'translateX(-50%)'}}>
+                      <Toast.Header>
+                        <strong className="mr-auto">Formula when calculating 1:1 LP ratio</strong>
+                      </Toast.Header>
+                      <Toast.Body>BUSD reserved / HONG reserved</Toast.Body>
+                    </Toast>
+
                     <ListGroup className="list-group-flush">
-                      <ListGroupItem><Button variant="light" onClick={ethEnabled}>Connect Wallet</Button></ListGroupItem>
-                      <ListGroupItem><Button variant="light" onClick={refreshPrice}>Refresh Price</Button></ListGroupItem>
-                      <ListGroupItem><Button variant="light" onClick={swapBUSDToHONG}>From 0.1 BUSD to HONG </Button></ListGroupItem>
-                      <ListGroupItem><Button variant="light" onClick={swapHONGToBUSD}>From 0.1 HONG to BUSD </Button></ListGroupItem>
+                      <ListGroupItem><Button variant="light" onClick={swapBUSDToHONG}>Put 0.1 BUSD to get HONG </Button></ListGroupItem>
+                      <ListGroupItem><Button variant="light" onClick={swapHONGToBUSD}>Put 0.1 HONG to get BUSD </Button></ListGroupItem>
                       <ListGroupItem><Button variant="light" onClick={addLiquidityFunction}>Add 1:1 Liquidity</Button></ListGroupItem>
                       <ListGroupItem><Button variant="light" onClick={removeLiquidityFunction}>Remove 1:1 Liquidity</Button></ListGroupItem>
                     </ListGroup>
@@ -332,6 +420,29 @@ function App() {
                   <Card.Body>
                     <Card.Title>HONG/BUSD Liquidity Farm </Card.Title>
                     <Card.Subtitle>Rewards: HONG</Card.Subtitle>
+                    <Card.Subtitle>&nbsp;</Card.Subtitle>
+                    <Card.Subtitle>{farmInfo}</Card.Subtitle>
+                    <Card.Subtitle>&nbsp;</Card.Subtitle>
+                    <Card.Subtitle>{myFarmInfo}</Card.Subtitle>
+                    <Card.Subtitle>&nbsp;</Card.Subtitle>
+                    <Card.Subtitle>{pendingRewardInfo}</Card.Subtitle>
+                    <Toast style={{ position: 'relative', left: '50%', transform: 'translateX(-50%)'}}>
+                      <Toast.Header>
+                        <strong className="mr-auto">Formula when someone stake or unstake</strong>
+                      </Toast.Header>
+                      <Toast.Body>New rewards = Bonus Multiplier * (this block number - last reward block number) * Reward per Block * this farm's allocation point / all farm's allocation point</Toast.Body>
+                      <Toast.Body>New rewards * 10% to developer's wallet</Toast.Body>
+                      <Toast.Body>New rewards * 100% to SyrupBar</Toast.Body>
+                      <Toast.Body>Update Accumulative Cake Per Share = Accumulative Cake Per Share + Total rewards * 1e12 / Total staked LP</Toast.Body>
+                      <Toast.Body>Update Last reward block number = this block number </Toast.Body>
+                    </Toast>
+                    <Toast style={{ position: 'relative', left: '50%', transform: 'translateX(-50%)'}}>
+                      <Toast.Header>
+                        <strong className="mr-auto">Formula of pending rewards</strong>
+                      </Toast.Header>
+                      <Toast.Body>My Pending rewards = My staked LP * Accumulative Cake Per Share / 1e12 - My Reward Debt </Toast.Body>
+                      <Toast.Body>My Reward Debt = my previous pending rewards</Toast.Body>
+                    </Toast>
                     <ListGroup className="list-group-flush">
                       <ListGroupItem><Button variant="light" onClick={poolInfo}>Farm Info </Button></ListGroupItem>
                       <ListGroupItem><Button variant="light" onClick={userInfo}>My Staking Info</Button></ListGroupItem>
