@@ -76,8 +76,17 @@ function App() {
         [MY_HONG_CONTRACT, MY_BUSD_CONTRACT]
       ]
 
+      let argsGetAmountsIn: Array<string | string[] | number> = [
+        window.web3.utils.toBN(100000000000000000).toString(),
+        [MY_BUSD_CONTRACT, MY_HONG_CONTRACT]
+      ]
+
       myRouterContract.methods.getAmountsOut(...argsGetAmountsOut).call({from: myAccount}, function (result, error) {
         setAmountOut(error[1] / error[0]);
+      });
+
+      myRouterContract.methods.getAmountsOut(...argsGetAmountsIn).call({from: myAccount}, function (result, error) {
+        setAmountIn(error[1] / error[0]);
       });
 
       myHongContract.methods.totalSupply().call({}, function (error, result) {
