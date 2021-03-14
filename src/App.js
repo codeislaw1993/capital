@@ -40,6 +40,9 @@ function App() {
   const toggleShowA = () => setShowA(!showA);
   const toggleShowB = () => setShowB(!showB);
   const toggleShowC = () => setShowC(!showC);
+  const [totalSupplyHong, setTotalSupplyHong] = useState();
+  const [totalSupplyBUSD, setTotalSupplyBUSD] = useState();
+  const [totalSupplyLP, setTotalSupplyLP] = useState();
 
   const ethEnabled = async() => {
     if (window.web3) {
@@ -73,17 +76,20 @@ function App() {
         [MY_HONG_CONTRACT, MY_BUSD_CONTRACT]
       ]
 
-      let argsGetAmountsIn: Array<string | string[] | number> = [
-        window.web3.utils.toBN(100000000000000000).toString(),
-        [MY_BUSD_CONTRACT, MY_HONG_CONTRACT]
-      ]
-
       myRouterContract.methods.getAmountsOut(...argsGetAmountsOut).call({from: myAccount}, function (result, error) {
         setAmountOut(error[1] / error[0]);
       });
 
-      myRouterContract.methods.getAmountsOut(...argsGetAmountsIn).call({from: myAccount}, function (result, error) {
-        setAmountIn(error[1] / error[0]);
+      myHongContract.methods.totalSupply().call({}, function (error, result) {
+       setTotalSupplyHong(result / 1000000000000000000);
+      });
+
+      myBUSDContract.methods.totalSupply().call({}, function (error, result) {
+        setTotalSupplyBUSD(result / 1000000000000000000);
+      });
+
+      myLPContract.methods.totalSupply().call({}, function (error, result) {
+        setTotalSupplyLP(result / 1000000000000000000);
       });
 
       myLPContract.methods.getReserves().call({from: myAccount}, function (result, error) {
@@ -297,7 +303,7 @@ function App() {
         myLPContract.methods.balanceOf(...argsBalanceOf).call({}, function(error, result2) {
           myMasterChefContract.methods.cakePerBlock().call({}, function(error, result3) {
               setFarmInfo(
-                  'Total staked LP token: ' + (result2 / 100000000000000000)+ ", " +
+                  'Total staked LP token: ' + (result2 / 1000000000000000000)+ ", " +
                   'Reward Per Block: ' + result3 + ", " +
                   'Accumulative Reward Per Share: ' + result['accCakePerShare'] + ", " +
                   'Allocated Point: ' + result['allocPoint'] + ", " +
@@ -318,7 +324,7 @@ function App() {
 
       myMasterChefContract.methods.userInfo(...args).call({}, function(error, result) {
         setMyFarmInfo(
-            'My staked LP token: ' + (result['amount'] / 100000000000000000) + ", " +
+            'My staked LP token: ' + (result['amount'] / 1000000000000000000) + ", " +
             'Reward Debt: ' + result['rewardDebt'])
       });
     }
@@ -355,6 +361,9 @@ function App() {
                 <Button variant="dark" onClick={refreshPrice}>Refresh Price</Button>
                 <h5>{hongReserve} HONG reserved</h5>
                 <h5>{busdReserve} BUSD reserved</h5>
+                <h5>{totalSupplyHong} HONG in the world</h5>
+                <h5>{totalSupplyBUSD} BUSD in the world</h5>
+                <h5>{totalSupplyLP} LP Token in the world</h5>
                 <h5><a target="_blank" rel="noreferrer" href={testnet_MY_CONTRACT}>Check Pancake Factory in BscScan testnet</a></h5>
                 <h5><a target="_blank" rel="noreferrer" href={testnet_MY_ROUTER_CONTRACT}>Check Pancake Router in BscScan testnet</a></h5>
                 <h5><a target="_blank" rel="noreferrer" href={testnet_MY_HONG_CONTRACT}>Check HONG in BscScan testnet</a></h5>
