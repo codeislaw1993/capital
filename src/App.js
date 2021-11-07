@@ -82,11 +82,19 @@ function App() {
       ]
 
       myRouterContract.methods.getAmountsOut(...argsGetAmountsOut).call({from: myAccount}, function (result, error) {
-        setAmountOut(error[1] / error[0]);
+        if (result != null) {
+          setAmountOut(result[1] / result[0]);
+        } else {
+          setAmountOut(error[1] / error[0]);
+        }
       });
 
       myRouterContract.methods.getAmountsOut(...argsGetAmountsIn).call({from: myAccount}, function (result, error) {
-        setAmountIn(error[1] / error[0]);
+        if (result != null) {
+          setAmountIn(result[1] / result[0]);
+        } else {
+          setAmountIn(error[1] / error[0]);
+        }
       });
 
       myHongContract.methods.totalSupply().call({}, function (error, result) {
@@ -156,8 +164,8 @@ function App() {
       let args: Array<string | string[] | number> = [
         MY_HONG_CONTRACT,
         MY_BUSD_CONTRACT,
-        window.web3.utils.toBN(100000000000000000).toString(),
-        window.web3.utils.toBN(100000000000000000).toString(),
+        window.web3.utils.toBN(10000000000000000).toString(),
+        window.web3.utils.toBN(10000000000000000).toString(),
         window.web3.utils.toBN(0).toString(),
         myAccount,
         '1741306645'
@@ -423,7 +431,7 @@ function App() {
                       <ListGroupItem><Button variant="light" onClick={swapBUSDToHONG}>Put 0.1 BUSD to get HONG </Button></ListGroupItem>
                       <ListGroupItem><Button variant="light" onClick={swapHONGToBUSD}>Put 0.1 HONG to get BUSD </Button></ListGroupItem>
                       <ListGroupItem><Button variant="light" onClick={addLiquidityFunction}>Add 1:1 Liquidity</Button></ListGroupItem>
-                      <ListGroupItem><Button variant="light" onClick={removeLiquidityFunction}>Remove 1:1 Liquidity</Button></ListGroupItem>
+                      <ListGroupItem><Button variant="light" onClick={removeLiquidityFunction}>Remove 0.1:0.1 Liquidity</Button></ListGroupItem>
                     </ListGroup>
                   </Card.Body>
                 </Card>

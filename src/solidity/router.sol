@@ -1,6 +1,5 @@
 /**
  *Submitted for verification at BscScan.com on 2021-03-07
- solidity 0.6.6
 */
 
 // File: contracts\IPancakeFactory.sol
@@ -295,7 +294,7 @@ library PancakeLibrary {
                 hex'ff',
                 factory,
                 keccak256(abi.encodePacked(token0, token1)),
-                hex'9f9f3228f493e825f710ba62b034beb3dc68a31aad0698f2439b65019c5c1832' // init code hash
+                hex'6705df5578d56fed7694710e38604c91714c499c22351555d2e1f41d6462ad4d' // init code hash
             ))));
     }
 

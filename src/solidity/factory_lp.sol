@@ -1,4 +1,10 @@
-pragma solidity =0.5.16;
+/**
+ *Submitted for verification at BscScan.com on 2021-03-08
+*/
+
+// File: contracts\interfaces\IPancakeFactory.sol
+
+pragma solidity >=0.5.0;
 
 interface IPancakeFactory {
     event PairCreated(address indexed token0, address indexed token1, address pair, uint);
@@ -15,6 +21,10 @@ interface IPancakeFactory {
     function setFeeTo(address) external;
     function setFeeToSetter(address) external;
 }
+
+// File: contracts\interfaces\IPancakePair.sol
+
+pragma solidity >=0.5.0;
 
 interface IPancakePair {
     event Approval(address indexed owner, address indexed spender, uint value);
@@ -67,6 +77,10 @@ interface IPancakePair {
     function initialize(address, address) external;
 }
 
+// File: contracts\interfaces\IPancakeERC20.sol
+
+pragma solidity >=0.5.0;
+
 interface IPancakeERC20 {
     event Approval(address indexed owner, address indexed spender, uint value);
     event Transfer(address indexed from, address indexed to, uint value);
@@ -89,25 +103,31 @@ interface IPancakeERC20 {
     function permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s) external;
 }
 
-interface IERC20 {
-    event Approval(address indexed owner, address indexed spender, uint value);
-    event Transfer(address indexed from, address indexed to, uint value);
+// File: contracts\libraries\SafeMath.sol
 
-    function name() external view returns (string memory);
-    function symbol() external view returns (string memory);
-    function decimals() external view returns (uint8);
-    function totalSupply() external view returns (uint);
-    function balanceOf(address owner) external view returns (uint);
-    function allowance(address owner, address spender) external view returns (uint);
+pragma solidity =0.5.16;
 
-    function approve(address spender, uint value) external returns (bool);
-    function transfer(address to, uint value) external returns (bool);
-    function transferFrom(address from, address to, uint value) external returns (bool);
+// a library for performing overflow-safe math, courtesy of DappHub (https://github.com/dapphub/ds-math)
+
+library SafeMath {
+    function add(uint x, uint y) internal pure returns (uint z) {
+        require((z = x + y) >= x, 'ds-math-add-overflow');
+    }
+
+    function sub(uint x, uint y) internal pure returns (uint z) {
+        require((z = x - y) <= x, 'ds-math-sub-underflow');
+    }
+
+    function mul(uint x, uint y) internal pure returns (uint z) {
+        require(y == 0 || (z = x * y) / y == x, 'ds-math-mul-overflow');
+    }
 }
 
-interface IPancakeCallee {
-    function pancakeCall(address sender, uint amount0, uint amount1, bytes calldata data) external;
-}
+// File: contracts\PancakeERC20.sol
+
+pragma solidity =0.5.16;
+
+
 
 contract PancakeERC20 is IPancakeERC20 {
     using SafeMath for uint;
@@ -198,6 +218,13 @@ contract PancakeERC20 is IPancakeERC20 {
         _approve(owner, spender, value);
     }
 }
+
+// File: contracts\libraries\Math.sol
+
+pragma solidity =0.5.16;
+
+// a library for performing various math operations
+
 library Math {
     function min(uint x, uint y) internal pure returns (uint z) {
         z = x < y ? x : y;
@@ -218,6 +245,15 @@ library Math {
     }
 }
 
+// File: contracts\libraries\UQ112x112.sol
+
+pragma solidity =0.5.16;
+
+// a library for handling binary fixed point numbers (https://en.wikipedia.org/wiki/Q_(number_format))
+
+// range: [0, 2**112 - 1]
+// resolution: 1 / 2**112
+
 library UQ112x112 {
     uint224 constant Q112 = 2**112;
 
@@ -232,19 +268,44 @@ library UQ112x112 {
     }
 }
 
-library SafeMath {
-    function add(uint x, uint y) internal pure returns (uint z) {
-        require((z = x + y) >= x, 'ds-math-add-overflow');
-    }
+// File: contracts\interfaces\IERC20.sol
 
-    function sub(uint x, uint y) internal pure returns (uint z) {
-        require((z = x - y) <= x, 'ds-math-sub-underflow');
-    }
+pragma solidity >=0.5.0;
 
-    function mul(uint x, uint y) internal pure returns (uint z) {
-        require(y == 0 || (z = x * y) / y == x, 'ds-math-mul-overflow');
-    }
+interface IERC20 {
+    event Approval(address indexed owner, address indexed spender, uint value);
+    event Transfer(address indexed from, address indexed to, uint value);
+
+    function name() external view returns (string memory);
+    function symbol() external view returns (string memory);
+    function decimals() external view returns (uint8);
+    function totalSupply() external view returns (uint);
+    function balanceOf(address owner) external view returns (uint);
+    function allowance(address owner, address spender) external view returns (uint);
+
+    function approve(address spender, uint value) external returns (bool);
+    function transfer(address to, uint value) external returns (bool);
+    function transferFrom(address from, address to, uint value) external returns (bool);
 }
+
+// File: contracts\interfaces\IPancakeCallee.sol
+
+pragma solidity >=0.5.0;
+
+interface IPancakeCallee {
+    function pancakeCall(address sender, uint amount0, uint amount1, bytes calldata data) external;
+}
+
+// File: contracts\PancakePair.sol
+
+pragma solidity =0.5.16;
+
+
+
+
+
+
+
 
 contract PancakePair is IPancakePair, PancakeERC20 {
     using SafeMath  for uint;
@@ -437,6 +498,12 @@ contract PancakePair is IPancakePair, PancakeERC20 {
         _update(IERC20(token0).balanceOf(address(this)), IERC20(token1).balanceOf(address(this)), reserve0, reserve1);
     }
 }
+
+// File: contracts\PancakeFactory.sol
+
+pragma solidity =0.5.16;
+
+
 
 contract PancakeFactory is IPancakeFactory {
     bytes32 public constant INIT_CODE_PAIR_HASH = keccak256(abi.encodePacked(type(PancakePair).creationCode));
