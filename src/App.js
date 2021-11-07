@@ -113,7 +113,7 @@ function App() {
         setHongReserve(error[0] / 1000000000000000000);
         setBusdReservce(error[1] / 1000000000000000000);
         let ratio1 = ("1 TCRO and " + error[0]/error[1] + " DELI to 1 LP");
-        let ratio2 = ("1 DELI and " + error[1]/error[0] + " TCRO to 1 LP");
+        let ratio2 = ("1 DELI and " + error[1]/error[0] + " DELI(gov) to 1 LP");
         setQuotedLPRatio(error[1] > error[0] ? ratio1 : ratio2 );
       });
     }
@@ -253,7 +253,7 @@ function App() {
   const stake = () => {
     if (myMasterChefContract) {
       let args: Array<string | string[] | number> = [
-        window.web3.utils.toBN(1).toString(),
+        window.web3.utils.toBN(2).toString(),
         window.web3.utils.toBN(10000000000000000).toString()
       ]
 
@@ -280,7 +280,7 @@ function App() {
   const unstake = () => {
     if (myMasterChefContract) {
       let args: Array<string | string[] | number> = [
-        window.web3.utils.toBN(1).toString(),
+        window.web3.utils.toBN(2).toString(),
         window.web3.utils.toBN(10000000000000000).toString()
       ]
 
@@ -296,7 +296,7 @@ function App() {
   const pendingReward = () => {
     if (myMasterChefContract) {
       let args: Array<string | string[] | number> = [
-        window.web3.utils.toBN(1).toString(),
+        window.web3.utils.toBN(2).toString(),
         myAccount
       ]
 
@@ -311,7 +311,7 @@ function App() {
   const poolInfo = () => {
     if (myMasterChefContract) {
       let args: Array<string | string[] | number> = [
-        window.web3.utils.toBN(1).toString()
+        window.web3.utils.toBN(2).toString()
       ]
       let argsBalanceOf: Array<string | string[] | number> = [
         MY_MASTERCHEF_CONTRACT
@@ -335,7 +335,7 @@ function App() {
   const userInfo = () => {
     if (myMasterChefContract) {
       let args: Array<string | string[] | number> = [
-        window.web3.utils.toBN(1).toString(),
+        window.web3.utils.toBN(2).toString(),
         myAccount
       ]
 
@@ -349,12 +349,12 @@ function App() {
   }
 
   useEffect(() => {
-    document.title = "Senior Deli Swap"
+    document.title = "Senior Deli Defi"
 
     setAmountIn("?")
     setAmountOut("?")
-    setQuotedLPRatio("? DELI and ? TCRO to 1 LP")
-    setQuotedLPRatio("? DELI and ? TCRO to 1 LP")
+    setQuotedLPRatio("? DELI and ? DELI(gov) to 1 LP")
+    setQuotedLPRatio("? DELI and ? DELI(gov) to 1 LP")
 
   }, []);
 
@@ -373,18 +373,18 @@ function App() {
           <Container>
             <Row>
               <Col>
-                <h3>Senior Deli Swap</h3>
+                <h3>Senior Deli Defi</h3>
                 <Button variant="danger" onClick={ethEnabled}>Connect Wallet with Cronos Testnet</Button>
                 <Button variant="dark" onClick={refreshPrice}>Refresh Price</Button>
                 <h5>{hongReserve} DELI reserved</h5>
-                <h5>{busdReserve} TCRO reserved</h5>
+                <h5>{busdReserve} DELI(gov) reserved</h5>
                 <h5>{totalSupplyHong} DELI in the world</h5>
-                <h5>{totalSupplyBUSD} TCRO in the world</h5>
+                <h5>{totalSupplyBUSD} DELI(gov) in the world</h5>
                 <h5>{totalSupplyLP} LP Token in the world</h5>
                 <h5><a target="_blank" rel="noreferrer" href={testnet_MY_CONTRACT}>View Factory Contract in Cronos Explorer</a></h5>
                 <h5><a target="_blank" rel="noreferrer" href={testnet_MY_ROUTER_CONTRACT}>View Router Contract in Cronos Explorer</a></h5>
                 <h5><a target="_blank" rel="noreferrer" href={testnet_MY_HONG_CONTRACT}>View DELI Contract in Cronos Explorer</a></h5>
-                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_BUSD_CONTRACT}>View TCRO Contract in Cronos Explorer</a></h5>
+                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_BUSD_CONTRACT}>View DELI(gov) Contract in Cronos Explorer</a></h5>
                 <h5><a target="_blank" rel="noreferrer" href={testnet_MY_LP_CONTRACT}>View Liquidity Pool Contract in Cronos Explorer</a></h5>
                 <h5><a target="_blank" rel="noreferrer" href={testnet_MY_MASTERCHEF_CONTRACT}>View Liquidity Farm Contract in Cronos Explorer</a></h5>
                 <h5><a target="_blank" rel="noreferrer" href={testnet_MY_SYRUP_CONTRACT}>View SENIOR Contract in Cronos Explorer</a></h5>
@@ -397,24 +397,24 @@ function App() {
                 <Card>
                   <Card.Body>
                     <Card.Title>Swap</Card.Title>
-                    <Card.Subtitle>1 TCRO to {amountIn} DELI</Card.Subtitle>
+                    <Card.Subtitle>1 DELI(gov) to {amountIn} DELI</Card.Subtitle>
                     <Card.Subtitle>&nbsp;</Card.Subtitle>
 
                     <Toast show={showA} onClose={toggleShowA} style={{ position: 'relative', left: '50%', transform: 'translateX(-50%)'}}>
                       <Toast.Header>
-                        <strong className="mr-auto">Formula when 1 TCRO swaps</strong>
+                        <strong className="mr-auto">Formula when 1 DELI(gov) swaps</strong>
                       </Toast.Header>
-                      <Toast.Body>1 TCRO * (DELI reserved * 998 / (TCRO reserved * 1000 + 99.8)) = DELI received</Toast.Body>
+                      <Toast.Body>1 DELI(gov) * (DELI reserved * 998 / (DELI(gov) reserved * 1000 + 99.8)) = DELI received</Toast.Body>
                     </Toast>
 
-                    <Card.Subtitle>1 DELI to {amountOut} TCRO</Card.Subtitle>
+                    <Card.Subtitle>1 DELI to {amountOut} DELI(gov)</Card.Subtitle>
                     <Card.Subtitle>&nbsp;</Card.Subtitle>
 
                     <Toast show={showB} onClose={toggleShowB} style={{ position: 'relative', left: '50%', transform: 'translateX(-50%)'}}>
                       <Toast.Header>
                         <strong className="mr-auto">Formula when 1 DELI swaps</strong>
                       </Toast.Header>
-                      <Toast.Body>1 DELI * (TCRO reserved * 998 / (DELI reserved * 1000 + 99.8)) = TCRO received</Toast.Body>
+                      <Toast.Body>1 DELI * (DELI(gov) reserved * 998 / (DELI reserved * 1000 + 99.8)) = DELI(gov) received</Toast.Body>
                     </Toast>
 
                     <Card.Subtitle>{quotedLPRatio} </Card.Subtitle>
@@ -424,12 +424,12 @@ function App() {
                       <Toast.Header>
                         <strong className="mr-auto">Formula when calculating 1:1 LP ratio</strong>
                       </Toast.Header>
-                      <Toast.Body>TCRO reserved / DELI reserved</Toast.Body>
+                      <Toast.Body>DELI(gov) reserved / DELI reserved</Toast.Body>
                     </Toast>
 
                     <ListGroup className="list-group-flush">
-                      <ListGroupItem><Button variant="light" onClick={swapBUSDToHONG}>Put 0.1 TCRO to get DELI </Button></ListGroupItem>
-                      <ListGroupItem><Button variant="light" onClick={swapHONGToBUSD}>Put 0.1 DELI to get TCRO </Button></ListGroupItem>
+                      <ListGroupItem><Button variant="light" onClick={swapBUSDToHONG}>Put 0.1 DELI(gov) to get DELI </Button></ListGroupItem>
+                      <ListGroupItem><Button variant="light" onClick={swapHONGToBUSD}>Put 0.1 DELI to get DELI(gov) </Button></ListGroupItem>
                       <ListGroupItem><Button variant="light" onClick={addLiquidityFunction}>Add 1:1 Liquidity</Button></ListGroupItem>
                       <ListGroupItem><Button variant="light" onClick={removeLiquidityFunction}>Remove 0.1:0.1 Liquidity</Button></ListGroupItem>
                     </ListGroup>
@@ -439,7 +439,7 @@ function App() {
               <Col>
                 <Card>
                   <Card.Body>
-                    <Card.Title>DELI / TCRO Liquidity Farm </Card.Title>
+                    <Card.Title>DELI / DELI(gov) Liquidity Farm </Card.Title>
                     <Card.Subtitle>Rewards: DELI</Card.Subtitle>
                     <Card.Subtitle>&nbsp;</Card.Subtitle>
                     <Card.Subtitle>{farmInfo}</Card.Subtitle>
