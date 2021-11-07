@@ -1,5 +1,6 @@
 /**
  *Submitted for verification at BscScan.com on 2021-03-07
+ solidity 0.6.6
 */
 
 // File: contracts\IPancakeFactory.sol

@@ -1,5 +1,6 @@
 /**
  *Submitted for verification at BscScan.com on 2021-03-08
+ 0.6.12
 */
 
 pragma solidity >=0.4.0;
