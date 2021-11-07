@@ -173,7 +173,7 @@ function App() {
 
       let approveArgs: Array<string | string[] | number> = [
         MY_ROUTER_CONTRACT,
-        window.web3.utils.toBN(1000000000000000000).toString()
+        window.web3.utils.toBN(100000000000000000).toString()
       ]
 
       myLPContract.methods.approve(...approveArgs).send({from: myAccount}, function (result, error) {
@@ -254,12 +254,12 @@ function App() {
     if (myMasterChefContract) {
       let args: Array<string | string[] | number> = [
         window.web3.utils.toBN(1).toString(),
-        window.web3.utils.toBN(100000000000000000).toString()
+        window.web3.utils.toBN(10000000000000000).toString()
       ]
 
       let approveArgs: Array<string | string[] | number> = [
         MY_MASTERCHEF_CONTRACT,
-        window.web3.utils.toBN(1000000000000000000).toString()
+        window.web3.utils.toBN(100000000000000000).toString()
       ]
 
       myLPContract.methods.approve(...approveArgs).send({from: myAccount}, function (result, error) {
@@ -281,7 +281,7 @@ function App() {
     if (myMasterChefContract) {
       let args: Array<string | string[] | number> = [
         window.web3.utils.toBN(1).toString(),
-        window.web3.utils.toBN(100000000000000000).toString()
+        window.web3.utils.toBN(10000000000000000).toString()
       ]
 
       myMasterChefContract.methods.withdraw(...args).send({from: myAccount}, function(result, error) {
@@ -467,8 +467,8 @@ function App() {
                     <ListGroup className="list-group-flush">
                       <ListGroupItem><Button variant="light" onClick={poolInfo}>Farm Info </Button></ListGroupItem>
                       <ListGroupItem><Button variant="light" onClick={userInfo}>My Staking Info</Button></ListGroupItem>
-                      <ListGroupItem><Button variant="light" onClick={stake}>Stake 1 LP to Farm </Button></ListGroupItem>
-                      <ListGroupItem><Button variant="light" onClick={unstake}>Unstake 1 LP to Farm </Button></ListGroupItem>
+                      <ListGroupItem><Button variant="light" onClick={stake}>Stake 0.1 LP to Farm </Button></ListGroupItem>
+                      <ListGroupItem><Button variant="light" onClick={unstake}>Unstake 0.1 LP to Farm </Button></ListGroupItem>
                       <ListGroupItem><Button variant="light" onClick={pendingReward}>Show pending rewards </Button></ListGroupItem>
                     </ListGroup>
                   </Card.Body>
