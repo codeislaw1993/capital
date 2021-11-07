@@ -112,8 +112,8 @@ function App() {
       myLPContract.methods.getReserves().call({from: myAccount}, function (result, error) {
         setHongReserve(error[0] / 1000000000000000000);
         setBusdReservce(error[1] / 1000000000000000000);
-        let ratio1 = ("1 BUSD and " + error[0]/error[1] + " HONG to 1 LP");
-        let ratio2 = ("1 HONG and " + error[1]/error[0] + " BUSD to 1 LP");
+        let ratio1 = ("1 TCRO and " + error[0]/error[1] + " DELI to 1 LP");
+        let ratio2 = ("1 DELI and " + error[1]/error[0] + " TCRO to 1 LP");
         setQuotedLPRatio(error[1] > error[0] ? ratio1 : ratio2 );
       });
     }
@@ -321,7 +321,7 @@ function App() {
           myMasterChefContract.methods.cakePerBlock().call({}, function(error, result3) {
               setFarmInfo(
                   'Total staked LP token: ' + (result2 / 1000000000000000000)+ ", " +
-                  'Reward Per Block: ' + result3 + ", " +
+                  'Deli Per Block: ' + result3 + ", " +
                   'Accumulative Reward Per Share: ' + result['accCakePerShare'] + ", " +
                   'Allocated Point: ' + result['allocPoint'] + ", " +
                   'Last Reward Block: ' + result['lastRewardBlock']);
@@ -349,12 +349,12 @@ function App() {
   }
 
   useEffect(() => {
-    document.title = "How PancakeSwap scams"
+    document.title = "Senior Deli Swap"
 
     setAmountIn("?")
     setAmountOut("?")
-    setQuotedLPRatio("? HONG and ? BUSD to 1 LP")
-    setQuotedLPRatio("? HONG and ? BUSD to 1 LP")
+    setQuotedLPRatio("? DELI and ? TCRO to 1 LP")
+    setQuotedLPRatio("? DELI and ? TCRO to 1 LP")
 
   }, []);
 
@@ -373,22 +373,22 @@ function App() {
           <Container>
             <Row>
               <Col>
-                <h3>How PancakeSwap scams</h3>
-                <Button variant="danger" onClick={ethEnabled}>Connect Wallet with Binance Smart Chain Testnet</Button>
+                <h3>Senior Deli Swap</h3>
+                <Button variant="danger" onClick={ethEnabled}>Connect Wallet with Cronos Testnet</Button>
                 <Button variant="dark" onClick={refreshPrice}>Refresh Price</Button>
-                <h5>{hongReserve} HONG reserved</h5>
-                <h5>{busdReserve} BUSD reserved</h5>
-                <h5>{totalSupplyHong} HONG in the world</h5>
-                <h5>{totalSupplyBUSD} BUSD in the world</h5>
+                <h5>{hongReserve} DELI reserved</h5>
+                <h5>{busdReserve} TCRO reserved</h5>
+                <h5>{totalSupplyHong} DELI in the world</h5>
+                <h5>{totalSupplyBUSD} TCRO in the world</h5>
                 <h5>{totalSupplyLP} LP Token in the world</h5>
-                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_CONTRACT}>Check Pancake Factory in BscScan testnet</a></h5>
-                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_ROUTER_CONTRACT}>Check Pancake Router in BscScan testnet</a></h5>
-                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_HONG_CONTRACT}>Check HONG in BscScan testnet</a></h5>
-                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_BUSD_CONTRACT}>Check BUSD in BscScan testnet</a></h5>
-                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_LP_CONTRACT}>Check Liquidity Pool in BscScan testnet</a></h5>
-                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_MASTERCHEF_CONTRACT}>Check Liquidity Farm in BscScan testnet</a></h5>
-                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_SYRUP_CONTRACT}>Check Syrup Bar in BscScan testnet</a></h5>
-                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_CAKE_CONTRACT}>Check Cake (Delegator) in BscScan testnet</a></h5>
+                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_CONTRACT}>View Factory Contract in Cronos Explorer</a></h5>
+                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_ROUTER_CONTRACT}>View Router Contract in Cronos Explorer</a></h5>
+                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_HONG_CONTRACT}>View DELI Contract in Cronos Explorer</a></h5>
+                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_BUSD_CONTRACT}>View TCRO Contract in Cronos Explorer</a></h5>
+                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_LP_CONTRACT}>View Liquidity Pool Contract in Cronos Explorer</a></h5>
+                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_MASTERCHEF_CONTRACT}>View Liquidity Farm Contract in Cronos Explorer</a></h5>
+                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_SYRUP_CONTRACT}>View SENIOR Contract in Cronos Explorer</a></h5>
+                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_CAKE_CONTRACT}>View DELI(governance) Contract in Cronos Explorer</a></h5>
                 <h5><a target="_blank" rel="noreferrer" href={GITHUB}>GitHub</a></h5>
               </Col>
             </Row>
@@ -397,24 +397,24 @@ function App() {
                 <Card>
                   <Card.Body>
                     <Card.Title>Swap</Card.Title>
-                    <Card.Subtitle>1 BUSD to {amountIn} HONG</Card.Subtitle>
+                    <Card.Subtitle>1 TCRO to {amountIn} DELI</Card.Subtitle>
                     <Card.Subtitle>&nbsp;</Card.Subtitle>
 
                     <Toast show={showA} onClose={toggleShowA} style={{ position: 'relative', left: '50%', transform: 'translateX(-50%)'}}>
                       <Toast.Header>
-                        <strong className="mr-auto">Formula when 1 BUSD swaps</strong>
+                        <strong className="mr-auto">Formula when 1 TCRO swaps</strong>
                       </Toast.Header>
-                      <Toast.Body>1 BUSD * (HONG reserved * 998 / (BUSD reserved * 1000 + 99.8)) = HONG received</Toast.Body>
+                      <Toast.Body>1 TCRO * (DELI reserved * 998 / (TCRO reserved * 1000 + 99.8)) = DELI received</Toast.Body>
                     </Toast>
 
-                    <Card.Subtitle>1 HONG to {amountOut} BUSD</Card.Subtitle>
+                    <Card.Subtitle>1 DELI to {amountOut} TCRO</Card.Subtitle>
                     <Card.Subtitle>&nbsp;</Card.Subtitle>
 
                     <Toast show={showB} onClose={toggleShowB} style={{ position: 'relative', left: '50%', transform: 'translateX(-50%)'}}>
                       <Toast.Header>
-                        <strong className="mr-auto">Formula when 1 HONG swaps</strong>
+                        <strong className="mr-auto">Formula when 1 DELI swaps</strong>
                       </Toast.Header>
-                      <Toast.Body>1 HONG * (BUSD reserved * 998 / (HONG reserved * 1000 + 99.8)) = BUSD received</Toast.Body>
+                      <Toast.Body>1 DELI * (TCRO reserved * 998 / (DELI reserved * 1000 + 99.8)) = TCRO received</Toast.Body>
                     </Toast>
 
                     <Card.Subtitle>{quotedLPRatio} </Card.Subtitle>
@@ -424,12 +424,12 @@ function App() {
                       <Toast.Header>
                         <strong className="mr-auto">Formula when calculating 1:1 LP ratio</strong>
                       </Toast.Header>
-                      <Toast.Body>BUSD reserved / HONG reserved</Toast.Body>
+                      <Toast.Body>TCRO reserved / DELI reserved</Toast.Body>
                     </Toast>
 
                     <ListGroup className="list-group-flush">
-                      <ListGroupItem><Button variant="light" onClick={swapBUSDToHONG}>Put 0.1 BUSD to get HONG </Button></ListGroupItem>
-                      <ListGroupItem><Button variant="light" onClick={swapHONGToBUSD}>Put 0.1 HONG to get BUSD </Button></ListGroupItem>
+                      <ListGroupItem><Button variant="light" onClick={swapBUSDToHONG}>Put 0.1 TCRO to get DELI </Button></ListGroupItem>
+                      <ListGroupItem><Button variant="light" onClick={swapHONGToBUSD}>Put 0.1 DELI to get TCRO </Button></ListGroupItem>
                       <ListGroupItem><Button variant="light" onClick={addLiquidityFunction}>Add 1:1 Liquidity</Button></ListGroupItem>
                       <ListGroupItem><Button variant="light" onClick={removeLiquidityFunction}>Remove 0.1:0.1 Liquidity</Button></ListGroupItem>
                     </ListGroup>
@@ -439,8 +439,8 @@ function App() {
               <Col>
                 <Card>
                   <Card.Body>
-                    <Card.Title>HONG/BUSD Liquidity Farm </Card.Title>
-                    <Card.Subtitle>Rewards: HONG</Card.Subtitle>
+                    <Card.Title>DELI / TCRO Liquidity Farm </Card.Title>
+                    <Card.Subtitle>Rewards: DELI</Card.Subtitle>
                     <Card.Subtitle>&nbsp;</Card.Subtitle>
                     <Card.Subtitle>{farmInfo}</Card.Subtitle>
                     <Card.Subtitle>&nbsp;</Card.Subtitle>
@@ -454,14 +454,14 @@ function App() {
                       <Toast.Body>New rewards = Bonus Multiplier * (this block number - last reward block number) * Reward per Block * this farm's allocation point / all farm's allocation point</Toast.Body>
                       <Toast.Body>New rewards * 10% to developer's wallet</Toast.Body>
                       <Toast.Body>New rewards * 100% to SyrupBar</Toast.Body>
-                      <Toast.Body>Update Accumulative Cake Per Share = Accumulative Cake Per Share + Total rewards * 1e12 / Total staked LP</Toast.Body>
+                      <Toast.Body>Update Accumulative Deli Per Share = Accumulative Deli Per Share + Total rewards * 1e12 / Total staked LP</Toast.Body>
                       <Toast.Body>Update Last reward block number = this block number </Toast.Body>
                     </Toast>
                     <Toast style={{ position: 'relative', left: '50%', transform: 'translateX(-50%)'}}>
                       <Toast.Header>
                         <strong className="mr-auto">Formula of pending rewards</strong>
                       </Toast.Header>
-                      <Toast.Body>My Pending rewards = My staked LP * Accumulative Cake Per Share / 1e12 - My Reward Debt </Toast.Body>
+                      <Toast.Body>My Pending rewards = My staked LP * Accumulative Deli Per Share / 1e12 - My Reward Debt </Toast.Body>
                       <Toast.Body>My Reward Debt = my previous pending rewards</Toast.Body>
                     </Toast>
                     <ListGroup className="list-group-flush">
