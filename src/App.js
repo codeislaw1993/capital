@@ -63,7 +63,6 @@ function App() {
   }
 
   const refreshPrice = () => {
-    ethEnabled()
     if (myRouterContract) {
       let argsGetAmountsOut: Array<string | string[] | number> = [
         window.web3.utils.toBN(100000000000000000).toString(),
@@ -353,6 +352,7 @@ function App() {
     setQuotedLPRatio("? DELI and ? DELI(gov) to 1 LP")
     setQuotedLPRatio("? DELI and ? DELI(gov) to 1 LP")
 
+    ethEnabled()
   }, []);
 
   let testnet_MY_CONTRACT = BSCSCAN_TESTNET + MY_CONTRACT;
@@ -413,7 +413,7 @@ function App() {
                     <Card.Subtitle>&nbsp;</Card.Subtitle>
                     <Card.Subtitle>{myFarmInfo}</Card.Subtitle>
                     <Card.Subtitle>&nbsp;</Card.Subtitle>
-                    <Card.Subtitle>{pendingRewardInfo}</Card.Subtitle>'
+                    <Card.Subtitle>{pendingRewardInfo}</Card.Subtitle>
                     <ListGroup className="list-group-flush">
                       <ListGroupItem><Button variant="light" onClick={stake}>Stake 0.1 LP to Farm </Button></ListGroupItem>
                       <ListGroupItem><Button variant="light" onClick={unstake}>Unstake 0.1 LP to Farm </Button></ListGroupItem>
