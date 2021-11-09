@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import PancakeFactory from './abi/PancakeFactory.json';
 import PancakeRouter from './abi/PancakeRouter.json';
 import Web3 from 'web3';
-import {Button, Container, Row, Col, Card, ListGroup, ListGroupItem, Toast } from 'react-bootstrap';
+import {Button, Container, Row, Col, Card, ListGroup, ListGroupItem } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const MY_CONTRACT = process.env.REACT_APP_MY_CONTRACT
@@ -31,15 +31,9 @@ function App() {
   const [hongReserve,setHongReserve] = useState();
   const [busdReserve,setBusdReservce] = useState();
   const [quotedLPRatio,setQuotedLPRatio] = useState();
-  const [showA, setShowA] = useState();
-  const [showB, setShowB] = useState();
-  const [showC, setShowC] = useState();
   const [farmInfo, setFarmInfo] = useState();
   const [myFarmInfo, setMyFarmInfo] = useState();
   const [pendingRewardInfo, setPendingRewardInfo] = useState();
-  const toggleShowA = () => setShowA(!showA);
-  const toggleShowB = () => setShowB(!showB);
-  const toggleShowC = () => setShowC(!showC);
   const [totalSupplyHong, setTotalSupplyHong] = useState();
   const [totalSupplyBUSD, setTotalSupplyBUSD] = useState();
   const [totalSupplyLP, setTotalSupplyLP] = useState();
@@ -69,7 +63,7 @@ function App() {
   }
 
   const refreshPrice = () => {
-
+    ethEnabled()
     if (myRouterContract) {
       let argsGetAmountsOut: Array<string | string[] | number> = [
         window.web3.utils.toBN(100000000000000000).toString(),
@@ -116,6 +110,10 @@ function App() {
         let ratio2 = ("1 DELI and " + error[1]/error[0] + " DELI(gov) to 1 LP");
         setQuotedLPRatio(error[1] > error[0] ? ratio1 : ratio2 );
       });
+
+      userInfo()
+      poolInfo()
+      pendingReward()
     }
   }
 
@@ -302,7 +300,7 @@ function App() {
 
       myMasterChefContract.methods.pendingCake(...args).call({from: myAccount}, function(error, result) {
         console.log(result);
-        setPendingRewardInfo('Pending Reward: ' + result);
+        setPendingRewardInfo('Pending Reward: ' + (result  / 1000000000000000000));
       });
     }
     return false;
@@ -341,8 +339,7 @@ function App() {
 
       myMasterChefContract.methods.userInfo(...args).call({}, function(error, result) {
         setMyFarmInfo(
-            'My staked LP token: ' + (result['amount'] / 1000000000000000000) + ", " +
-            'Reward Debt: ' + result['rewardDebt'])
+            'My staked LP token: ' + (result['amount'] / 1000000000000000000))
       });
     }
     return false;
@@ -381,15 +378,6 @@ function App() {
                 <h5>{totalSupplyHong} DELI in the world</h5>
                 <h5>{totalSupplyBUSD} DELI(gov) in the world</h5>
                 <h5>{totalSupplyLP} LP Token in the world</h5>
-                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_CONTRACT}>View Factory Contract in Cronos Explorer</a></h5>
-                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_ROUTER_CONTRACT}>View Router Contract in Cronos Explorer</a></h5>
-                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_HONG_CONTRACT}>View DELI Contract in Cronos Explorer</a></h5>
-                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_BUSD_CONTRACT}>View DELI(gov) Contract in Cronos Explorer</a></h5>
-                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_LP_CONTRACT}>View Liquidity Pool Contract in Cronos Explorer</a></h5>
-                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_MASTERCHEF_CONTRACT}>View Liquidity Farm Contract in Cronos Explorer</a></h5>
-                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_SYRUP_CONTRACT}>View SENIOR Contract in Cronos Explorer</a></h5>
-                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_CAKE_CONTRACT}>View DELI(governance) Contract in Cronos Explorer</a></h5>
-                <h5><a target="_blank" rel="noreferrer" href={GITHUB}>GitHub</a></h5>
               </Col>
             </Row>
             <Row>
@@ -400,33 +388,12 @@ function App() {
                     <Card.Subtitle>1 DELI(gov) to {amountIn} DELI</Card.Subtitle>
                     <Card.Subtitle>&nbsp;</Card.Subtitle>
 
-                    <Toast show={showA} onClose={toggleShowA} style={{ position: 'relative', left: '50%', transform: 'translateX(-50%)'}}>
-                      <Toast.Header>
-                        <strong className="mr-auto">Formula when 1 DELI(gov) swaps</strong>
-                      </Toast.Header>
-                      <Toast.Body>1 DELI(gov) * (DELI reserved * 998 / (DELI(gov) reserved * 1000 + 99.8)) = DELI received</Toast.Body>
-                    </Toast>
-
                     <Card.Subtitle>1 DELI to {amountOut} DELI(gov)</Card.Subtitle>
                     <Card.Subtitle>&nbsp;</Card.Subtitle>
 
-                    <Toast show={showB} onClose={toggleShowB} style={{ position: 'relative', left: '50%', transform: 'translateX(-50%)'}}>
-                      <Toast.Header>
-                        <strong className="mr-auto">Formula when 1 DELI swaps</strong>
-                      </Toast.Header>
-                      <Toast.Body>1 DELI * (DELI(gov) reserved * 998 / (DELI reserved * 1000 + 99.8)) = DELI(gov) received</Toast.Body>
-                    </Toast>
 
                     <Card.Subtitle>{quotedLPRatio} </Card.Subtitle>
                     <Card.Subtitle>&nbsp;</Card.Subtitle>
-
-                    <Toast show={showC} onClose={toggleShowC} style={{ position: 'relative', left: '50%', transform: 'translateX(-50%)'}}>
-                      <Toast.Header>
-                        <strong className="mr-auto">Formula when calculating 1:1 LP ratio</strong>
-                      </Toast.Header>
-                      <Toast.Body>DELI(gov) reserved / DELI reserved</Toast.Body>
-                    </Toast>
-
                     <ListGroup className="list-group-flush">
                       <ListGroupItem><Button variant="light" onClick={swapBUSDToHONG}>Put 0.1 DELI(gov) to get DELI </Button></ListGroupItem>
                       <ListGroupItem><Button variant="light" onClick={swapHONGToBUSD}>Put 0.1 DELI to get DELI(gov) </Button></ListGroupItem>
@@ -440,39 +407,33 @@ function App() {
                 <Card>
                   <Card.Body>
                     <Card.Title>DELI / DELI(gov) Liquidity Farm </Card.Title>
-                    <Card.Subtitle>Rewards: DELI</Card.Subtitle>
+                    <Card.Subtitle>Rewards: DELI(gov)</Card.Subtitle>
                     <Card.Subtitle>&nbsp;</Card.Subtitle>
                     <Card.Subtitle>{farmInfo}</Card.Subtitle>
                     <Card.Subtitle>&nbsp;</Card.Subtitle>
                     <Card.Subtitle>{myFarmInfo}</Card.Subtitle>
                     <Card.Subtitle>&nbsp;</Card.Subtitle>
-                    <Card.Subtitle>{pendingRewardInfo}</Card.Subtitle>
-                    <Toast style={{ position: 'relative', left: '50%', transform: 'translateX(-50%)'}}>
-                      <Toast.Header>
-                        <strong className="mr-auto">Formula when someone stake or unstake</strong>
-                      </Toast.Header>
-                      <Toast.Body>New rewards = Bonus Multiplier * (this block number - last reward block number) * Reward per Block * this farm's allocation point / all farm's allocation point</Toast.Body>
-                      <Toast.Body>New rewards * 10% to developer's wallet</Toast.Body>
-                      <Toast.Body>New rewards * 100% to SyrupBar</Toast.Body>
-                      <Toast.Body>Update Accumulative Deli Per Share = Accumulative Deli Per Share + Total rewards * 1e12 / Total staked LP</Toast.Body>
-                      <Toast.Body>Update Last reward block number = this block number </Toast.Body>
-                    </Toast>
-                    <Toast style={{ position: 'relative', left: '50%', transform: 'translateX(-50%)'}}>
-                      <Toast.Header>
-                        <strong className="mr-auto">Formula of pending rewards</strong>
-                      </Toast.Header>
-                      <Toast.Body>My Pending rewards = My staked LP * Accumulative Deli Per Share / 1e12 - My Reward Debt </Toast.Body>
-                      <Toast.Body>My Reward Debt = my previous pending rewards</Toast.Body>
-                    </Toast>
+                    <Card.Subtitle>{pendingRewardInfo}</Card.Subtitle>'
                     <ListGroup className="list-group-flush">
-                      <ListGroupItem><Button variant="light" onClick={poolInfo}>Farm Info </Button></ListGroupItem>
-                      <ListGroupItem><Button variant="light" onClick={userInfo}>My Staking Info</Button></ListGroupItem>
                       <ListGroupItem><Button variant="light" onClick={stake}>Stake 0.1 LP to Farm </Button></ListGroupItem>
                       <ListGroupItem><Button variant="light" onClick={unstake}>Unstake 0.1 LP to Farm </Button></ListGroupItem>
-                      <ListGroupItem><Button variant="light" onClick={pendingReward}>Show pending rewards </Button></ListGroupItem>
                     </ListGroup>
                   </Card.Body>
                 </Card>
+              </Col>
+            </Row>
+            <Row>
+              <Col>
+
+                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_CONTRACT}>View Factory Contract in Cronos Explorer</a></h5>
+                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_ROUTER_CONTRACT}>View Router Contract in Cronos Explorer</a></h5>
+                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_HONG_CONTRACT}>View DELI Contract in Cronos Explorer</a></h5>
+                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_BUSD_CONTRACT}>View DELI(gov) Contract in Cronos Explorer</a></h5>
+                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_LP_CONTRACT}>View Liquidity Pool Contract in Cronos Explorer</a></h5>
+                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_MASTERCHEF_CONTRACT}>View Liquidity Farm Contract in Cronos Explorer</a></h5>
+                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_SYRUP_CONTRACT}>View SENIOR Contract in Cronos Explorer</a></h5>
+                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_CAKE_CONTRACT}>View DELI(governance) Contract in Cronos Explorer</a></h5>
+                <h5><a target="_blank" rel="noreferrer" href={GITHUB}>GitHub</a></h5>
               </Col>
             </Row>
           </Container>
