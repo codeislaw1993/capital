@@ -2,6 +2,7 @@ import './App.css';
 import React, { useState, useEffect } from 'react';
 import PancakeFactory from './abi/PancakeFactory.json';
 import PancakeRouter from './abi/PancakeRouter.json';
+import LendingPoolConfigurator from './abi/LendingPoolConfigurator.json';
 import Web3 from 'web3';
 import {Button, Container, Row, Col, Card, ListGroup, ListGroupItem } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -16,6 +17,7 @@ const MY_SYRUP_CONTRACT=process.env.REACT_APP_MY_SYRUP_CONTRACT
 const MY_CAKE_CONTRACT=process.env.REACT_APP_MY_CAKE_CONTRACT
 const BSCSCAN_TESTNET=process.env.REACT_APP_BSCSCAN_TESTNET
 const GITHUB=process.env.REACT_APP_GITHUB
+const MY_LENDING_POOL_CONFIGURATOR=process.env.REACT_APP_MY_LENDING_POOL_CONFIGURATOR_CONTRACT;
 
 function App() {
 
@@ -26,6 +28,8 @@ function App() {
   const [myBUSDContract, setMyBUSDContract] = useState();
   const [myLPContract, setMyLPContract] = useState();
   const [myMasterChefContract, setMyMasterChefContract] = useState();
+  const [myLendingPoolConfigurationContract, setMyLendingPoolConfigurationContract] = useState();
+
   const [amountOut,setAmountOut] = useState();
   const [amountIn,setAmountIn] = useState();
   const [hongReserve,setHongReserve] = useState();
@@ -37,6 +41,8 @@ function App() {
   const [totalSupplyHong, setTotalSupplyHong] = useState();
   const [totalSupplyBUSD, setTotalSupplyBUSD] = useState();
   const [totalSupplyLP, setTotalSupplyLP] = useState();
+
+  const [lendingPoolConfigurator, setLendingPoolConfigurator] = useState();
 
   const ethEnabled = async() => {
     if (window.web3) {
@@ -59,6 +65,7 @@ function App() {
       setMyBUSDContract(await new window.web3.eth.Contract(dataHong, MY_BUSD_CONTRACT));
       setMyLPContract(await new window.web3.eth.Contract(dataLpToken, MY_LP_CONTRACT));
       setMyMasterChefContract(await new window.web3.eth.Contract(dataMasterChef, MY_MASTERCHEF_CONTRACT));
+      setMyLendingPoolConfigurationContract(await new window.web3.eth.Contract(LendingPoolConfigurator.output.abis, MY_LENDING_POOL_CONFIGURATOR));
     }
   }
 
@@ -335,13 +342,67 @@ function App() {
         window.web3.utils.toBN(2).toString(),
         myAccount
       ]
-
       myMasterChefContract.methods.userInfo(...args).call({}, function(error, result) {
         setMyFarmInfo(
             'My staked LP token: ' + (result['amount'] / 1000000000000000000))
       });
     }
     return false;
+  }
+
+  const initReserve = () => {
+    if (myLendingPoolConfigurationContract) {
+
+      let initInputParams: {
+        aTokenImpl: string;
+        stableDebtTokenImpl: string;
+        variableDebtTokenImpl: string;
+        underlyingAssetDecimals: BigNumberish;
+        interestRateStrategyAddress: string;
+        underlyingAsset: string;
+        treasury: string;
+        incentivesController: string;
+        underlyingAssetName: string;
+        aTokenName: string;
+        aTokenSymbol: string;
+        variableDebtTokenName: string;
+        variableDebtTokenSymbol: string;
+        stableDebtTokenName: string;
+        stableDebtTokenSymbol: string;
+        params: string;
+      }[] = [];
+
+      initInputParams.push({
+        aTokenImpl: await getContractAddressWithJsonFallback(aTokenImpl, poolName),
+        stableDebtTokenImpl: await getContractAddressWithJsonFallback(
+            eContractid.StableDebtToken,
+            poolName
+        ),
+        variableDebtTokenImpl: await getContractAddressWithJsonFallback(
+            eContractid.VariableDebtToken,
+            poolName
+        ),
+        underlyingAssetDecimals: reserveDecimals,
+        interestRateStrategyAddress: strategyAddresses[strategy.name],
+        underlyingAsset: tokenAddresses[symbol],
+        treasury: treasuryAddress,
+        incentivesController: incentivesController,
+        underlyingAssetName: symbol,
+        aTokenName: `${aTokenNamePrefix} ${symbol}`,
+        aTokenSymbol: `a${symbolPrefix}${symbol}`,
+        variableDebtTokenName: `${variableDebtTokenNamePrefix} ${symbolPrefix}${symbol}`,
+        variableDebtTokenSymbol: `variableDebt${symbolPrefix}${symbol}`,
+        stableDebtTokenName: `${stableDebtTokenNamePrefix} ${symbol}`,
+        stableDebtTokenSymbol: `stableDebt${symbolPrefix}${symbol}`,
+        params: await getATokenExtraParams(aTokenImpl, tokenAddresses[symbol]),
+      });
+
+      myLendingPoolConfigurationContract.methods.batchInitReserve(initInputParams).send({from: myAccount}, function(result, error) {
+        console.log("myMasterChefContract deposit");
+        console.log(result);
+        console.log(error);
+      });
+    }
   }
 
   useEffect(() => {
