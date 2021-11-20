@@ -2,7 +2,6 @@ import './App.css';
 import React, { useState, useEffect } from 'react';
 import PancakeFactory from './abi/PancakeFactory.json';
 import PancakeRouter from './abi/PancakeRouter.json';
-import LendingPoolConfigurator from './abi/LendingPoolConfigurator.json';
 import Web3 from 'web3';
 import {Button, Container, Row, Col, Card, ListGroup, ListGroupItem } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -17,7 +16,14 @@ const MY_SYRUP_CONTRACT=process.env.REACT_APP_MY_SYRUP_CONTRACT
 const MY_CAKE_CONTRACT=process.env.REACT_APP_MY_CAKE_CONTRACT
 const BSCSCAN_TESTNET=process.env.REACT_APP_BSCSCAN_TESTNET
 const GITHUB=process.env.REACT_APP_GITHUB
+
 const MY_LENDING_POOL_CONFIGURATOR=process.env.REACT_APP_MY_LENDING_POOL_CONFIGURATOR_CONTRACT;
+const MY_LENDING_POOL_ADDRESS_PROVIDER=process.env.REACT_APP_MY_LENDING_POOL_ADDRESS_PROVIDER_CONTRACT;
+const MY_LENDING_POOL_COLLATERAL_MANAGER_CONTRACT=process.env.REACT_APP_MY_LENDING_POOL_COLLATERAL_MANAGER_CONTRACT;
+
+const MY_CERC20IMMUTABLE=process.env.REACT_APP_MY_CERC20IMMUTABLE;
+const MY_COMPTROLLER=process.env.REACT_APP_MY_COMPTROLLER;
+const MY_ASSET=process.env.REACT_APP_MY_ASSET;
 
 function App() {
 
@@ -29,6 +35,10 @@ function App() {
   const [myLPContract, setMyLPContract] = useState();
   const [myMasterChefContract, setMyMasterChefContract] = useState();
   const [myLendingPoolConfigurationContract, setMyLendingPoolConfigurationContract] = useState();
+  const [myLendingPoolAddressProviderContract, setMyLendingPoolAddressProviderContract] = useState();
+  const [mycERC20Immutable, setMycERC20Immutable] = useState();
+  const [myCompTroller, setMyCompTroller] = useState();
+  const [myAsset, setMyAsset] = useState();
 
   const [amountOut,setAmountOut] = useState();
   const [amountIn,setAmountIn] = useState();
@@ -38,11 +48,13 @@ function App() {
   const [farmInfo, setFarmInfo] = useState();
   const [myFarmInfo, setMyFarmInfo] = useState();
   const [pendingRewardInfo, setPendingRewardInfo] = useState();
+  const [lendingInfo, setLendingInfo] = useState();
   const [totalSupplyHong, setTotalSupplyHong] = useState();
   const [totalSupplyBUSD, setTotalSupplyBUSD] = useState();
-  const [totalSupplyLP, setTotalSupplyLP] = useState();
+  const [totalSupplyLending, setTotalSupplyLending] = useState();
+  const [cash, setCash] = useState();
 
-  const [lendingPoolConfigurator, setLendingPoolConfigurator] = useState();
+  const [totalSupplyLP, setTotalSupplyLP] = useState();
 
   const ethEnabled = async() => {
     if (window.web3) {
@@ -58,6 +70,11 @@ function App() {
       const dataHong = require('./abi/Hong.json');
       const dataLpToken = require('./abi/lpToken.json');
       const dataMasterChef = require('./abi/MasterChef.json');
+      const dataLendingPoolConfigurator = require('./abi/lending/LendingPoolConfigurator.json');
+      const dataLendingPoolAddressProvider = require('./abi/lending/LendingPoolAddressProvider.json');
+      const dataCERC20Immutable = require('./abi/lending/CERC20Immutable.json');
+      const dataCompTroller = require('./abi/lending/CompTroller.json');
+      const dataMyAsset = require('./abi/lending/MyAsset.json');
 
       setMyContract(await new window.web3.eth.Contract(PancakeFactory.abi, MY_CONTRACT));
       setMyRouterContract(await new window.web3.eth.Contract(PancakeRouter.abi, MY_ROUTER_CONTRACT));
@@ -65,7 +82,11 @@ function App() {
       setMyBUSDContract(await new window.web3.eth.Contract(dataHong, MY_BUSD_CONTRACT));
       setMyLPContract(await new window.web3.eth.Contract(dataLpToken, MY_LP_CONTRACT));
       setMyMasterChefContract(await new window.web3.eth.Contract(dataMasterChef, MY_MASTERCHEF_CONTRACT));
-      setMyLendingPoolConfigurationContract(await new window.web3.eth.Contract(LendingPoolConfigurator.output.abis, MY_LENDING_POOL_CONFIGURATOR));
+      setMyLendingPoolConfigurationContract(await new window.web3.eth.Contract(dataLendingPoolConfigurator, MY_LENDING_POOL_CONFIGURATOR));
+      setMyLendingPoolAddressProviderContract(await new window.web3.eth.Contract(dataLendingPoolAddressProvider, MY_LENDING_POOL_ADDRESS_PROVIDER));
+      setMycERC20Immutable(await new window.web3.eth.Contract(dataCERC20Immutable, MY_CERC20IMMUTABLE));
+      setMyCompTroller(await new window.web3.eth.Contract(dataCompTroller, MY_COMPTROLLER));
+      setMyAsset(await new window.web3.eth.Contract(dataMyAsset, MY_ASSET));
     }
   }
 
@@ -121,6 +142,69 @@ function App() {
       poolInfo()
       pendingReward()
     }
+  }
+
+  const refreshLending = () => {
+    if (mycERC20Immutable) {
+      mycERC20Immutable.methods.getCash().call({}, function (result, error) {
+        console.log(result);
+        console.log(error);
+        setCash(error / 1000000000000000000);
+      });
+
+      mycERC20Immutable.methods.totalSupply().call({}, function (result, error) {
+        console.log(result);
+        console.log(error);
+        setTotalSupplyLending(error / 1000000000000000000);
+      });
+    }
+  }
+
+  const supplyAssets = () => {
+    if (mycERC20Immutable) {
+      let approveArgs: Array<string | string[] | number> = [
+        MY_CERC20IMMUTABLE,
+        window.web3.utils.toBN(1000000000000000000).toString()
+      ]
+      let arg: Array<string | string[] | number> = [
+        window.web3.utils.toBN(100000000000000000).toString()
+      ]
+
+      myAsset.methods.approve(...approveArgs).send({from: myAccount}, function (result, error) {
+        console.log("myAsset approve");
+        console.log(result);
+        console.log(error);
+
+        mycERC20Immutable.methods.mint(...arg).send({from: myAccount}, function(result, error) {
+          console.log("mycERC20Immutable mint");
+          console.log(result);
+          console.log(error);
+        });
+      });
+    }
+  }
+
+  const redeemAssets = () => {
+    if (mycERC20Immutable) {
+      let mintArg: Array<string | string[] | number> = [
+        window.web3.utils.toBN(100000000000000000).toString()
+      ]
+
+      mycERC20Immutable.methods.redeem(...mintArg).send({from: myAccount}, function(result, error) {
+        console.log("mycERC20Immutable redeem");
+        console.log(result);
+        console.log(error);
+      });
+
+    }
+  }
+
+  const borrowAssets = () => {
+
+  }
+
+  const repayBorrowAssets = () => {
+
   }
 
   const addLiquidityFunction = async() => {
@@ -350,14 +434,59 @@ function App() {
     return false;
   }
 
+  const getLendingPoolConfigurator = () => {
+    if (myLendingPoolAddressProviderContract) {
+      let args: Array<string | string[] | number> = [
+      ]
+      myLendingPoolAddressProviderContract.methods.getLendingPoolConfigurator(...args).call({}, function(error, result) {
+        console.log(error)
+        console.log(result)
+      });
+    }
+  }
+
+  const setLendingPoolConfigurator = () => {
+    if (myLendingPoolAddressProviderContract) {
+      let args: Array<string | string[] | number> = [
+        MY_LENDING_POOL_CONFIGURATOR
+      ]
+      myLendingPoolAddressProviderContract.methods.setLendingPoolConfiguratorImpl(...args).send({from: myAccount}, function(error, result) {
+        console.log(error)
+        console.log(result)
+      });
+    }
+  }
+
+  const getLendingPoolCollateralManager = () => {
+    if (myLendingPoolAddressProviderContract) {
+      let args: Array<string | string[] | number> = [
+      ]
+      myLendingPoolAddressProviderContract.methods.getLendingPoolCollateralManager(...args).call({}, function(error, result) {
+        console.log(error)
+        console.log(result)
+      });
+    }
+  }
+
+  const setLendingPoolCollateralManager = () => {
+    if (myLendingPoolAddressProviderContract) {
+      let args: Array<string | string[] | number> = [
+        MY_LENDING_POOL_COLLATERAL_MANAGER_CONTRACT
+      ]
+      myLendingPoolAddressProviderContract.methods.setLendingPoolCollateralManager(...args).send({from: myAccount}, function(error, result) {
+        console.log(error)
+        console.log(result)
+      });
+    }
+  }
+
   const initReserve = () => {
     if (myLendingPoolConfigurationContract) {
-
       let initInputParams: {
         aTokenImpl: string;
         stableDebtTokenImpl: string;
         variableDebtTokenImpl: string;
-        underlyingAssetDecimals: BigNumberish;
+        underlyingAssetDecimals: number;
         interestRateStrategyAddress: string;
         underlyingAsset: string;
         treasury: string;
@@ -371,34 +500,37 @@ function App() {
         stableDebtTokenSymbol: string;
         params: string;
       }[] = [];
-
+      /**
+       * @dev Initializes the aToken
+       * @param pool The address of the lending pool where this aToken will be used
+       * @param treasury The address of the Aave treasury, receiving the fees on this aToken
+       * @param underlyingAsset The address of the underlying asset of this aToken (E.g. WETH for aWETH)
+       * @param incentivesController The smart contract managing potential incentives distribution
+       * @param aTokenDecimals The decimals of the aToken, same as the underlying asset's
+       * @param aTokenName The name of the aToken
+       * @param aTokenSymbol The symbol of the aToken
+       */
       initInputParams.push({
-        aTokenImpl: await getContractAddressWithJsonFallback(aTokenImpl, poolName),
-        stableDebtTokenImpl: await getContractAddressWithJsonFallback(
-            eContractid.StableDebtToken,
-            poolName
-        ),
-        variableDebtTokenImpl: await getContractAddressWithJsonFallback(
-            eContractid.VariableDebtToken,
-            poolName
-        ),
-        underlyingAssetDecimals: reserveDecimals,
-        interestRateStrategyAddress: strategyAddresses[strategy.name],
-        underlyingAsset: tokenAddresses[symbol],
-        treasury: treasuryAddress,
-        incentivesController: incentivesController,
-        underlyingAssetName: symbol,
-        aTokenName: `${aTokenNamePrefix} ${symbol}`,
-        aTokenSymbol: `a${symbolPrefix}${symbol}`,
-        variableDebtTokenName: `${variableDebtTokenNamePrefix} ${symbolPrefix}${symbol}`,
-        variableDebtTokenSymbol: `variableDebt${symbolPrefix}${symbol}`,
-        stableDebtTokenName: `${stableDebtTokenNamePrefix} ${symbol}`,
-        stableDebtTokenSymbol: `stableDebt${symbolPrefix}${symbol}`,
-        params: await getATokenExtraParams(aTokenImpl, tokenAddresses[symbol]),
+        aTokenImpl: '0x8cA93B3d4e35B2886597bC9E06c3900029E26925',
+        stableDebtTokenImpl: '0xa36FA1d06d0c6f79242879Dc34Bf47Bd4B6282Ed',
+        variableDebtTokenImpl: '0xfDaA4aA2D457357Ec0Be63eF54c7efF0601aba68',
+        underlyingAssetDecimals: 0,
+        interestRateStrategyAddress: '0x190701d7B10Fe1c46075544c9EC7E2230e16056A',
+        underlyingAsset: '0xeA61f8F65095aceAa9344a1ddA0849F16Cf6cdAb',
+        treasury: '0xe71fa402007FAD17dA769D1bBEfA6d0790fCe2c7',
+        incentivesController: '0x0000000000000000000000000000000000000000',
+        underlyingAssetName: 'DELI',
+        aTokenName: 'aDELI',
+        aTokenSymbol: 'aDELI',
+        variableDebtTokenName: 'vDELI',
+        variableDebtTokenSymbol: 'vDELI',
+        stableDebtTokenName: 'sDELI',
+        stableDebtTokenSymbol: 'sDELI',
+        params: '0x10'
       });
 
       myLendingPoolConfigurationContract.methods.batchInitReserve(initInputParams).send({from: myAccount}, function(result, error) {
-        console.log("myMasterChefContract deposit");
+        console.log("myLendingPoolConfigurationContract batchInitReserve");
         console.log(result);
         console.log(error);
       });
@@ -478,6 +610,21 @@ function App() {
                     <ListGroup className="list-group-flush">
                       <ListGroupItem><Button variant="light" onClick={stake}>Stake 0.1 LP to Farm </Button></ListGroupItem>
                       <ListGroupItem><Button variant="light" onClick={unstake}>Unstake 0.1 LP to Farm </Button></ListGroupItem>
+                    </ListGroup>
+                  </Card.Body>
+                </Card>
+              </Col>
+              <Col>
+                <Card>
+                  <Card.Body>
+                    <Card.Title>DELI Lending Protocal </Card.Title>
+                    <Card.Subtitle>Has {cash} DELI to provide</Card.Subtitle>
+                    <Card.Subtitle>&nbsp;</Card.Subtitle>
+                    <Card.Subtitle>Minted {totalSupplyLending} cDELI</Card.Subtitle>
+                    <ListGroup className="list-group-flush">
+                      <ListGroupItem><Button variant="light" onClick={refreshLending}>Refresh Price</Button></ListGroupItem>
+                      <ListGroupItem><Button variant="light" onClick={supplyAssets}>Supply Assets</Button></ListGroupItem>
+                      <ListGroupItem><Button variant="light" onClick={redeemAssets}>Redeem Assets</Button></ListGroupItem>
                     </ListGroup>
                   </Card.Body>
                 </Card>
