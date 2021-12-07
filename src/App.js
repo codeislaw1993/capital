@@ -2,6 +2,18 @@ import './App.css';
 import React, { useState, useEffect } from 'react';
 import PancakeFactory from './abi/PancakeFactory.json';
 import PancakeRouter from './abi/PancakeRouter.json';
+
+import Controller from './abi/fujidao/Controller.json';
+import ProviderAAVEAVAX from './abi/fujidao/ProviderAAVEAVAX.json';
+import ProviderBenqi from './abi/fujidao/ProviderBenqi.json';
+import FujiVaultAVAX from './abi/fujidao/FujiVaultAVAX.json';
+import FliquidatorAVAX from './abi/fujidao/FliquidatorAVAX.json';
+import FlasherAVAX from './abi/fujidao/FlasherAVAX.json';
+import FujiAdmin from './abi/fujidao/FujiAdmin.json';
+import FujiOracle from './abi/fujidao/FujiOracle.json';
+import FujiERC1155 from './abi/fujidao/FujiERC1155.json';
+import FujiMapping from './abi/fujidao/FujiMapping.json';
+
 import Web3 from 'web3';
 import {Button, Container, Row, Col, Card, ListGroup, ListGroupItem } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -24,6 +36,20 @@ const MY_LENDING_POOL_COLLATERAL_MANAGER_CONTRACT=process.env.REACT_APP_MY_LENDI
 const MY_CERC20IMMUTABLE=process.env.REACT_APP_MY_CERC20IMMUTABLE;
 const MY_COMPTROLLER=process.env.REACT_APP_MY_COMPTROLLER;
 const MY_ASSET=process.env.REACT_APP_MY_ASSET;
+
+const MY_ProviderAAVE=process.env.REACT_APP_MY_ProviderAAVE;
+const MY_ProviderBenqi=process.env.REACT_APP_MY_ProviderBenqi;
+const MY_FujiVaultBTCUSDT=process.env.REACT_APP_MY_FujiVaultBTCUSDT;
+const MY_FujiVaultETHBTC=process.env.REACT_APP_MY_FujiVaultETHBTC;
+const MY_FliquidatorAVAX=process.env.REACT_APP_MY_FliquidatorAVAX;
+const MY_FujiController=process.env.REACT_APP_MY_FujiController;
+const MY_FlasherAVAX=process.env.REACT_APP_MY_FlasherAVAX;
+const MY_FujiAdmin=process.env.REACT_APP_MY_FujiAdmin;
+const MY_FujiOracle=process.env.REACT_APP_MY_FujiOracle;
+
+const WBTC=process.env.REACT_APP_WBTC;
+const WETH=process.env.REACT_APP_WETH;
+const USDT=process.env.REACT_APP_USDT;
 
 function App() {
 
@@ -53,8 +79,23 @@ function App() {
   const [totalSupplyBUSD, setTotalSupplyBUSD] = useState();
   const [totalSupplyLending, setTotalSupplyLending] = useState();
   const [cash, setCash] = useState();
+  const [ethNeededCollateral, setEthNeededCollateral] = useState();
+  const [userDepositBalance, setUserDepositBalance] = useState();
+  const [userDebtBalance, setUserDebtBalance] = useState();
+
+  const [myFlasherAVAX, setMyFlasherAVAX] = useState();
+  const [myProviderAAVE, setMyProviderAAVE] = useState();
+  const [myProviderBenqi, setMyProviderBenqi] = useState();
+  const [myFujiVaultBTCUSDT, setMyFujiVaultBTCUSDT] = useState();
+  const [myFujiVaultETHBTC, setMyFujiVaultETHBTC] = useState();
+  const [myFliquidatorAVAX, setMyFliquidatorAVAX] = useState();
+  const [myFujiController, setMyFujiController] = useState();
+  const [myFujiAdmin, setMyFujiAdmin] = useState();
+  const [myFujiOracle, setMyFujiOracle] = useState();
 
   const [totalSupplyLP, setTotalSupplyLP] = useState();
+  const [myETHContract, setMyETHContract] = useState();
+  const [myBTCContract, setMyBTCContract] = useState();
 
   const ethEnabled = async() => {
     if (window.web3) {
@@ -76,17 +117,31 @@ function App() {
       const dataCompTroller = require('./abi/lending/CompTroller.json');
       const dataMyAsset = require('./abi/lending/MyAsset.json');
 
-      setMyContract(await new window.web3.eth.Contract(PancakeFactory.abi, MY_CONTRACT));
-      setMyRouterContract(await new window.web3.eth.Contract(PancakeRouter.abi, MY_ROUTER_CONTRACT));
-      setMyHongContract(await new window.web3.eth.Contract(dataHong, MY_HONG_CONTRACT));
-      setMyBUSDContract(await new window.web3.eth.Contract(dataHong, MY_BUSD_CONTRACT));
-      setMyLPContract(await new window.web3.eth.Contract(dataLpToken, MY_LP_CONTRACT));
-      setMyMasterChefContract(await new window.web3.eth.Contract(dataMasterChef, MY_MASTERCHEF_CONTRACT));
-      setMyLendingPoolConfigurationContract(await new window.web3.eth.Contract(dataLendingPoolConfigurator, MY_LENDING_POOL_CONFIGURATOR));
-      setMyLendingPoolAddressProviderContract(await new window.web3.eth.Contract(dataLendingPoolAddressProvider, MY_LENDING_POOL_ADDRESS_PROVIDER));
-      setMycERC20Immutable(await new window.web3.eth.Contract(dataCERC20Immutable, MY_CERC20IMMUTABLE));
-      setMyCompTroller(await new window.web3.eth.Contract(dataCompTroller, MY_COMPTROLLER));
-      setMyAsset(await new window.web3.eth.Contract(dataMyAsset, MY_ASSET));
+      // setMyContract(await new window.web3.eth.Contract(PancakeFactory.abi, MY_CONTRACT));
+      // setMyRouterContract(await new window.web3.eth.Contract(PancakeRouter.abi, MY_ROUTER_CONTRACT));
+      // setMyHongContract(await new window.web3.eth.Contract(dataHong, MY_HONG_CONTRACT));
+      // setMyBUSDContract(await new window.web3.eth.Contract(dataHong, MY_BUSD_CONTRACT));
+      // setMyLPContract(await new window.web3.eth.Contract(dataLpToken, MY_LP_CONTRACT));
+      // setMyMasterChefContract(await new window.web3.eth.Contract(dataMasterChef, MY_MASTERCHEF_CONTRACT));
+      //
+      // setMyLendingPoolConfigurationContract(await new window.web3.eth.Contract(dataLendingPoolConfigurator, MY_LENDING_POOL_CONFIGURATOR));
+      // setMyLendingPoolAddressProviderContract(await new window.web3.eth.Contract(dataLendingPoolAddressProvider, MY_LENDING_POOL_ADDRESS_PROVIDER));
+      // setMycERC20Immutable(await new window.web3.eth.Contract(dataCERC20Immutable, MY_CERC20IMMUTABLE));
+      // setMyCompTroller(await new window.web3.eth.Contract(dataCompTroller, MY_COMPTROLLER));
+      // setMyAsset(await new window.web3.eth.Contract(dataMyAsset, MY_ASSET));
+
+      setMyProviderAAVE(await new  window.web3.eth.Contract(ProviderAAVEAVAX.abi, MY_ProviderAAVE));
+      setMyProviderBenqi(await new  window.web3.eth.Contract(ProviderBenqi.abi, MY_ProviderBenqi));
+      setMyFujiVaultBTCUSDT(await new  window.web3.eth.Contract(FujiVaultAVAX.abi, MY_FujiVaultBTCUSDT));
+      setMyFujiVaultETHBTC(await new  window.web3.eth.Contract(FujiVaultAVAX.abi, MY_FujiVaultETHBTC));
+      setMyFliquidatorAVAX(await new  window.web3.eth.Contract(FliquidatorAVAX.abi, MY_FliquidatorAVAX));
+      setMyFujiController(await new  window.web3.eth.Contract(Controller.abi, MY_FujiController));
+      setMyFlasherAVAX(await new  window.web3.eth.Contract(FlasherAVAX.abi, MY_FlasherAVAX));
+      setMyFujiAdmin(await new  window.web3.eth.Contract(FujiAdmin.abi, MY_FujiAdmin));
+      setMyFujiOracle(await new  window.web3.eth.Contract(FujiOracle.abi, MY_FujiOracle));
+
+      setMyETHContract(await new  window.web3.eth.Contract(dataHong, WETH));
+      setMyBTCContract(await new  window.web3.eth.Contract(dataHong, WBTC));
     }
   }
 
@@ -537,6 +592,208 @@ function App() {
     }
   }
 
+  const getNeededCollateralFor = () => {
+    if (myFujiVaultETHBTC) {
+      let args: Array<string | string[] | number> = [
+        1,
+        true
+      ]
+      myFujiVaultETHBTC.methods.getNeededCollateralFor(...args).call({}, function(error, result) {
+        console.log(result);
+        setEthNeededCollateral((result / 10000000000));
+      });
+
+      myFujiVaultETHBTC.methods.userDepositBalance(myAccount).call({}, function(error, result) {
+        console.log(result);
+        setUserDepositBalance((result / 1000000000000000000));
+      });
+
+      myFujiVaultETHBTC.methods.userDebtBalance(myAccount).call({}, function(error, result) {
+        console.log(result);
+        setUserDebtBalance((result / 10000000000));
+      });
+    }
+  }
+
+  const setProvider = () => {
+    if (myFujiVaultETHBTC) {
+
+      let args: Array<string | string[] | number> = [
+        [MY_ProviderAAVE]
+      ]
+
+      myFujiVaultETHBTC.methods.setProviders(...args).send({from: myAccount}, function(error, result) {
+          console.log(result);
+        });
+    }
+  }
+
+  const deposit = () => {
+    if (myFujiVaultETHBTC) {
+      let approveArgs: Array<string | string[] | number> = [
+        MY_FujiVaultETHBTC,
+        window.web3.utils.toBN(10000000000000).toString()
+      ]
+
+      let args: Array<string | string[] | number> = [
+        window.web3.utils.toBN(10000000000000).toString()
+      ]
+
+      myETHContract.methods.approve(...approveArgs).send({from: myAccount}, function (result, error) {
+        console.log("myFujiVaultETHBTC approve");
+        console.log(result);
+        console.log(error);
+        myFujiVaultETHBTC.methods.deposit(...args).send({from: myAccount}, function(error, result) {
+          console.log(result);
+        });
+      });
+    }
+  }
+
+  const withdraw = () => {
+    if (myFujiVaultETHBTC) {
+
+      let args: Array<string | string[] | number> = [
+        window.web3.utils.toBN(10000000000000).toString()
+      ]
+
+      myFujiVaultETHBTC.methods.withdraw(...args).send({from: myAccount}, function(error, result) {
+        console.log(result);
+      });
+    }
+  }
+
+  const borrow = () => {
+    if (myFujiVaultETHBTC) {
+      let args: Array<string | string[] | number> = [
+        window.web3.utils.toBN(10).toString()
+      ]
+
+      myFujiVaultETHBTC.methods.borrow(...args).send({from: myAccount}, function(error, result) {
+        console.log(result);
+      });
+    }
+  }
+
+  const payback = () => {
+    if (myFujiVaultETHBTC) {
+      let approveArgs: Array<string | string[] | number> = [
+        MY_FujiVaultETHBTC,
+        window.web3.utils.toBN(10000000000000).toString()
+      ]
+
+      let args: Array<string | string[] | number> = [
+        window.web3.utils.toBN(10).toString()
+      ]
+
+      myBTCContract.methods.approve(...approveArgs).send({from: myAccount}, function (result, error) {
+        console.log("myBTCContract approve");
+        console.log(result);
+        console.log(error);
+        myFujiVaultETHBTC.methods.payback(...args).send({from: myAccount}, function(error, result) {
+          console.log(result);
+        });
+      });
+    }
+  }
+
+  const batchLiqudate = () => {
+    if (myFliquidatorAVAX) {
+      let approveArgs: Array<string | string[] | number> = [
+        MY_FliquidatorAVAX,
+        window.web3.utils.toBN(10000000000000000000).toString()
+      ]
+
+      let liqudatable : string[] = [];
+      liqudatable.push(myAccount);
+
+      let args: Array<string | string[] | number> = [
+        liqudatable,
+        MY_FujiVaultETHBTC
+      ]
+
+      myBTCContract.methods.approve(...approveArgs).send({from: myAccount}, function (result, error) {
+        console.log("myBTCContract approve");
+        myFliquidatorAVAX.methods.batchLiquidate(...args).send({from: myAccount}, function(error, result) {
+          console.log(result);
+        });
+      });
+    }
+  }
+
+
+  const flashBatchLiquidate = () => {
+    if (myFliquidatorAVAX) {
+      let approveArgs: Array<string | string[] | number> = [
+        MY_FliquidatorAVAX,
+        window.web3.utils.toBN(10000000000000000000).toString()
+      ]
+
+      let liqudatable : string[] = [myAccount];
+
+      let args: Array<string | string[] | number> = [
+        liqudatable,
+        MY_FujiVaultETHBTC,
+          0
+      ]
+
+      myBTCContract.methods.approve(...approveArgs).send({from: myAccount}, function (result, error) {
+        console.log("myBTCContract approve");
+        myFliquidatorAVAX.methods.flashBatchLiquidate(...args).send({from: myAccount}, function(error, result) {
+          console.log(result);
+        });
+      });
+    }
+  }
+
+  const flashClose = () => {
+    if (myFliquidatorAVAX) {
+      let liqudatable : string[] = [myAccount];
+
+      let args: Array<string | string[] | number> = [
+        -1,
+        MY_FujiVaultETHBTC,
+        0
+      ]
+
+        myFliquidatorAVAX.methods.flashClose(...args).send({from: myAccount}, function(error, result) {
+          console.log(result);
+        });
+    }
+  }
+
+  const refinanceFromAToB = () => {
+    if (myFujiController) {
+      let liqudatable : string[] = [myAccount];
+
+      let args: Array<string | string[] | number> = [
+        MY_FujiVaultETHBTC,
+        "0xe7A190921bB7ff61F518077E16955a2D2cBb833E",
+        0
+      ]
+
+      myFujiController.methods.doRefinancing(...args).send({from: myAccount}, function(error, result) {
+        console.log(result);
+      });
+    }
+  }
+
+  const refinanceFromBToA = () => {
+    if (myFujiController) {
+      let liqudatable : string[] = [myAccount];
+
+      let args: Array<string | string[] | number> = [
+        MY_FujiVaultETHBTC,
+        "0x57b3c1e2FEF127b2870236cCbc71263621559961",
+        0
+      ]
+
+      myFujiController.methods.doRefinancing(...args).send({from: myAccount}, function(error, result) {
+        console.log(result);
+      });
+    }
+  }
+
   useEffect(() => {
     document.title = "Senior Deli Defi"
 
@@ -548,7 +805,7 @@ function App() {
     ethEnabled()
   }, []);
 
-  let testnet_MY_CONTRACT = BSCSCAN_TESTNET + MY_CONTRACT;
+  let testnet_MY_CONTRACT = BSCSCAN_TESTNET + MY_FujiVaultETHBTC;
   let testnet_MY_ROUTER_CONTRACT = BSCSCAN_TESTNET + MY_ROUTER_CONTRACT;
   let testnet_MY_HONG_CONTRACT = BSCSCAN_TESTNET + MY_HONG_CONTRACT;
   let testnet_MY_BUSD_CONTRACT = BSCSCAN_TESTNET + MY_BUSD_CONTRACT;
@@ -564,67 +821,30 @@ function App() {
             <Row>
               <Col>
                 <h3>Senior Deli Defi</h3>
-                <Button variant="danger" onClick={ethEnabled}>Connect Wallet with Cronos Testnet</Button>
-                <Button variant="dark" onClick={refreshPrice}>Refresh Price</Button>
-                <h5>{hongReserve} DELI reserved</h5>
-                <h5>{busdReserve} DELI(gov) reserved</h5>
-                <h5>{totalSupplyHong} DELI in the world</h5>
-                <h5>{totalSupplyBUSD} DELI(gov) in the world</h5>
-                <h5>{totalSupplyLP} LP Token in the world</h5>
+                <h4>Needs {ethNeededCollateral} ETH as collateral to borrow 1 BTC, including safety factors</h4>
+                <h4>You deposited {userDepositBalance} ETH as collateral</h4>
+                <h4>You borrowed {userDebtBalance} BTC</h4>
+                <Button variant="danger" onClick={ethEnabled}>Connect Wallet</Button>
+                <Button variant="dark" onClick={getNeededCollateralFor}>Refresh Price</Button>
               </Col>
             </Row>
             <Row>
               <Col>
                 <Card>
                   <Card.Body>
-                    <Card.Title>Swap</Card.Title>
-                    <Card.Subtitle>1 DELI(gov) to {amountIn} DELI</Card.Subtitle>
-                    <Card.Subtitle>&nbsp;</Card.Subtitle>
-
-                    <Card.Subtitle>1 DELI to {amountOut} DELI(gov)</Card.Subtitle>
-                    <Card.Subtitle>&nbsp;</Card.Subtitle>
-
-
-                    <Card.Subtitle>{quotedLPRatio} </Card.Subtitle>
-                    <Card.Subtitle>&nbsp;</Card.Subtitle>
+                    <Card.Title>FujiDAO</Card.Title>
                     <ListGroup className="list-group-flush">
-                      <ListGroupItem><Button variant="light" onClick={swapBUSDToHONG}>Put 0.1 DELI(gov) to get DELI </Button></ListGroupItem>
-                      <ListGroupItem><Button variant="light" onClick={swapHONGToBUSD}>Put 0.1 DELI to get DELI(gov) </Button></ListGroupItem>
-                      <ListGroupItem><Button variant="light" onClick={addLiquidityFunction}>Add 1:1 Liquidity</Button></ListGroupItem>
-                      <ListGroupItem><Button variant="light" onClick={removeLiquidityFunction}>Remove 0.1:0.1 Liquidity</Button></ListGroupItem>
+                      <ListGroupItem><Button variant="light" onClick={deposit}>Deposit 0.00001 ETH to vault</Button></ListGroupItem>
+                      <ListGroupItem><Button variant="light" onClick={withdraw}>Withdraw 0.00001 ETH from vault</Button></ListGroupItem>
+                      <ListGroupItem><Button variant="light" onClick={borrow}>Borrow 0.00000001 BTC from vault</Button></ListGroupItem>
+                      <ListGroupItem><Button variant="light" onClick={payback}>Payback 0.00000001 BTC from vault</Button></ListGroupItem>
+                      <ListGroupItem><Button variant="light" onClick={flashClose}>Flash close myself</Button></ListGroupItem>
                     </ListGroup>
-                  </Card.Body>
-                </Card>
-              </Col>
-              <Col>
-                <Card>
-                  <Card.Body>
-                    <Card.Title>DELI / DELI(gov) Liquidity Farm </Card.Title>
-                    <Card.Subtitle>Rewards: DELI(gov)</Card.Subtitle>
-                    <Card.Subtitle>&nbsp;</Card.Subtitle>
-                    <Card.Subtitle>{farmInfo}</Card.Subtitle>
-                    <Card.Subtitle>&nbsp;</Card.Subtitle>
-                    <Card.Subtitle>{myFarmInfo}</Card.Subtitle>
-                    <Card.Subtitle>&nbsp;</Card.Subtitle>
-                    <Card.Subtitle>{pendingRewardInfo}</Card.Subtitle>
                     <ListGroup className="list-group-flush">
-                      <ListGroupItem><Button variant="light" onClick={stake}>Stake 0.1 LP to Farm </Button></ListGroupItem>
-                      <ListGroupItem><Button variant="light" onClick={unstake}>Unstake 0.1 LP to Farm </Button></ListGroupItem>
-                    </ListGroup>
-                  </Card.Body>
-                </Card>
-              </Col>
-              <Col>
-                <Card>
-                  <Card.Body>
-                    <Card.Title>DELI Lending Protocal </Card.Title>
-                    <Card.Subtitle>Has {cash} DELI to provide</Card.Subtitle>
-                    <Card.Subtitle>&nbsp;</Card.Subtitle>
-                    <Card.Subtitle>Minted {totalSupplyLending} cDELI</Card.Subtitle>
-                    <ListGroup className="list-group-flush">
-                      <ListGroupItem><Button variant="light" onClick={refreshLending}>Refresh Price</Button></ListGroupItem>
-                      <ListGroupItem><Button variant="light" onClick={supplyAssets}>Supply Assets</Button></ListGroupItem>
-                      <ListGroupItem><Button variant="light" onClick={redeemAssets}>Redeem Assets</Button></ListGroupItem>
+                      <ListGroupItem><Button variant="dark" onClick={batchLiqudate}>Liqudate myself</Button></ListGroupItem>
+                      <ListGroupItem><Button variant="dark" onClick={flashBatchLiquidate}>Flash Liqudate myself</Button></ListGroupItem>
+                      <ListGroupItem><Button variant="dark" onClick={refinanceFromAToB}>Refinance from A to B</Button></ListGroupItem>
+                      <ListGroupItem><Button variant="dark" onClick={refinanceFromBToA}>Refinance from B to A</Button></ListGroupItem>
                     </ListGroup>
                   </Card.Body>
                 </Card>
@@ -632,15 +852,7 @@ function App() {
             </Row>
             <Row>
               <Col>
-
-                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_CONTRACT}>View Factory Contract in Cronos Explorer</a></h5>
-                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_ROUTER_CONTRACT}>View Router Contract in Cronos Explorer</a></h5>
-                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_HONG_CONTRACT}>View DELI Contract in Cronos Explorer</a></h5>
-                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_BUSD_CONTRACT}>View DELI(gov) Contract in Cronos Explorer</a></h5>
-                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_LP_CONTRACT}>View Liquidity Pool Contract in Cronos Explorer</a></h5>
-                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_MASTERCHEF_CONTRACT}>View Liquidity Farm Contract in Cronos Explorer</a></h5>
-                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_SYRUP_CONTRACT}>View SENIOR Contract in Cronos Explorer</a></h5>
-                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_CAKE_CONTRACT}>View DELI(governance) Contract in Cronos Explorer</a></h5>
+                <h5><a target="_blank" rel="noreferrer" href={testnet_MY_CONTRACT}>View Contract in Avalanche Explorer</a></h5>
                 <h5><a target="_blank" rel="noreferrer" href={GITHUB}>GitHub</a></h5>
               </Col>
             </Row>
